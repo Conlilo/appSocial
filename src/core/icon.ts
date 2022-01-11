@@ -6,4 +6,6 @@ export enum Icon {
   Comment = require('../assets/icons/comment-icon.png'),
   Hearts = require('../assets/icons/Heart.png'),
   Comments = require('../assets/icons/Comment.png'),
+  Send = require('../assets/icons/IconSend.png'),
+  ArrowLeft = require('../assets/icons/arrow-left.png'),
 }
