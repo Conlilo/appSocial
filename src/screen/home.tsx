@@ -57,15 +57,21 @@ const Home = () => {
             <Space />
 
             <View style={styles.c147}>
-              <TouchableOpacity style={styles.optionBar}>
+              <TouchableOpacity
+                style={styles.optionBar}
+                onPress={() => navigation.navigate('CreatePost')}>
                 <Image source={Icon.Image} style={styles.iconUpPost} />
                 <Text>Ảnh</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.optionBar}>
+              <TouchableOpacity
+                style={styles.optionBar}
+                onPress={() => navigation.navigate('CreatePost')}>
                 <Image style={styles.iconUpPost} source={Icon.Video} />
                 <Text>Video</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.optionBar}>
+              <TouchableOpacity
+                style={styles.optionBar}
+                onPress={() => navigation.navigate('CreatePost')}>
                 <Image source={Icon.Product} style={styles.iconUpPost} />
                 <Text>Sản phẩm</Text>
               </TouchableOpacity>

@@ -16,6 +16,10 @@ interface ImagePost {
 const ImagePost = ({ images }: ImagePost) => {
   const navigation = useNavigation();
 
+  if (images.length === 0) {
+    return <View />;
+  }
+
   if (images.length === 1) {
     return (
       <TouchableOpacity

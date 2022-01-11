@@ -1,4 +1,6 @@
+import { StackRouter } from '@react-navigation/native';
 import { createSlice } from '@reduxjs/toolkit';
+import { ActionSheetIOS } from 'react-native';
 
 const initialState = {
   dataPost: [
@@ -212,7 +214,61 @@ const initialState = {
     },
   ],
   store: [],
-  idKeyPost: 6,
+  idKeyPost: 100,
+  idKeyComment: 100,
+  idUserRep: 0,
+  idCommentRep: 0,
+};
+
+const focusReplyUser = (state, action) => {
+  state.idCommentRep = action.payload.idFocusRep;
+  state.idUserRep = action.payload.idUserComment;
+};
+
+const defocusReplyUser = state => {
+  state.idCommentRep = 0;
+  state.idUserRep = 0;
+};
+
+const addPost = (state, action) => {
+  state.store.push({
+    id: 5,
+    idUser: 1,
+    timePost: 'Vừa xong',
+    titlePost: '',
+    imagePost: [],
+    numLike: 0,
+    numComment: 0,
+    commentDetail: [],
+  });
+};
+
+const testAction = () => {};
+
+const addCommentPost = (state, action) => {
+  state.store
+    .filter(x => x.id === action.payload.idPost)[0]
+    .commentDetail.push({
+      idComment: state.idKeyPost,
+      idUserComment: 1,
+      titleComment: action.payload.comment,
+      timeComment: 'Vừa xong',
+      repComment: [],
+    });
+  state.idKeyPost += 1;
+};
+
+const addReplyComment = (state, action) => {
+  state.store
+    .filter(x => x.id === action.payload.idPost)[0]
+    .commentDetail.filter(x => x.idComment === action.payload.idCommentRep)[0]
+    .repComment.push({
+      idUserRepComment: 1,
+      titleRepComment: action.payload.comment,
+      timeRepComment: 'Vừa xong',
+    });
+  state.idUserRep = 0;
+  state.idCommentRep = 0;
 };
 
 const publicStore = state => {
@@ -232,7 +288,17 @@ const dislikedPost = (state, action) => {
 const dataSlice = createSlice({
   name: 'data',
   initialState,
-  reducers: { publicStore, likedPost, dislikedPost },
+  reducers: {
+    publicStore,
+    likedPost,
+    dislikedPost,
+    addCommentPost,
+    defocusReplyUser,
+    focusReplyUser,
+    addReplyComment,
+    addPost,
+    testAction,
+  },
 });
 
 export const dataActions = dataSlice.actions;

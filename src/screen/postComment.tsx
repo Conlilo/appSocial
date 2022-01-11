@@ -11,7 +11,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import BtnLike from '../components/btnLike';
 import CmtForm from '../components/cmtForm';
 import ImagePost from '../components/imagePost';
@@ -19,6 +19,7 @@ import Line from '../components/line';
 import PostForm from '../components/postForm';
 import PostStatus from '../components/postStatus';
 import { Icon } from '../core/icon';
+import { dataActions } from '../redux/slices/dataApi';
 
 const PostComment = () => {
   const navigation = useNavigation();
@@ -28,12 +29,16 @@ const PostComment = () => {
   const active = route?.params?.active;
   const data = useSelector(state => state.data.store);
   const user = useSelector(state => state.data.dataUser);
+  const idFocusRep = useSelector(state => state.data.idUserRep);
+  const idCommentRep = useSelector(state => state.data.idCommentRep);
   const dataPostDetail = data.filter(x => x.id === idPost);
+  const dispatch = useDispatch();
+  const [comment, setComment] = useState('');
 
   const [keyboardHeight, setKeyboardHeight] = useState(safeAreaInsets.bottom);
 
   useEffect(() => {
-    Keyboard.addListener('keyboardWillShow', e => {
+    Keyboard.addListener('keyboardDidShow', e => {
       setKeyboardHeight(e.endCoordinates.height);
     });
 
@@ -70,7 +75,6 @@ const PostComment = () => {
               active={active}
               idPost={idPost}
             />
-            {console.log(dataPostDetail[0].imagePost)}
             <View>
               <TouchableOpacity
                 onPress={() => navigation.navigate('PostDetail')}>
@@ -98,13 +102,56 @@ const PostComment = () => {
           </Fragment>
         }
         // eslint-disable-next-line react-native/no-inline-styles
-        style={{ marginBottom: 60 }}
+        style={{ marginBottom: 80 }}
       />
       <View style={[styles.createComment, { paddingBottom: keyboardHeight }]}>
-        <TextInput style={styles.inputText} placeholder="Viết bình luận" />
-        <TouchableOpacity>
-          <Image source={Icon.Send} style={styles.iconSend} />
-        </TouchableOpacity>
+        {idFocusRep === 0 ? (
+          <View />
+        ) : (
+          // eslint-disable-next-line react-native/no-inline-styles
+          <View style={[styles.flexRow, { paddingBottom: 40 }]}>
+            {/* eslint-disable-next-line react-native/no-inline-styles*/}
+            <Text style={{ color: '#868686' }}>
+              Bạn đang trả lời {user.filter(x => x.id === idFocusRep)[0].name}
+              {console.log()}
+            </Text>
+            <TouchableOpacity
+              onPress={() => dispatch(dataActions.defocusReplyUser())}>
+              <Image
+                source={Icon.Xicon}
+                /* eslint-disable-next-line react-native/no-inline-styles*/
+                style={{ width: 14, height: 17, tintColor: '#868686' }}
+              />
+            </TouchableOpacity>
+          </View>
+        )}
+        <View style={[styles.btnComment, { paddingBottom: keyboardHeight }]}>
+          <TextInput
+            style={styles.inputText}
+            placeholder="Viết bình luận"
+            onChangeText={text => setComment(text)}
+            value={comment}
+          />
+          <TouchableOpacity
+            onPress={() => {
+              if (idFocusRep === 0) {
+                if (comment !== '') {
+                  dispatch(dataActions.addCommentPost({ idPost, comment }));
+                }
+              } else {
+                dispatch(
+                  dataActions.addReplyComment({
+                    comment,
+                    idPost,
+                    idCommentRep,
+                  }),
+                );
+                setComment('');
+              }
+            }}>
+            <Image source={Icon.Send} style={styles.iconSend} />
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -116,9 +163,17 @@ const styles = StyleSheet.create({
   keyboardStyle: {
     marginTop: 10,
   },
-  createComment: {
+  btnComment: {
     flexDirection: 'row',
     justifyContent: 'center',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'white',
+  },
+  createComment: {
+    flexDirection: 'row',
     position: 'absolute',
     bottom: 0,
     left: 0,

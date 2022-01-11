@@ -7,7 +7,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { dataActions } from '../redux/slices/dataApi';
 
 const CmtForm = ({
   idComment,
@@ -23,6 +24,7 @@ const CmtForm = ({
   repComment: Array<object>;
 }) => {
   const user = useSelector(state => state.data.dataUser);
+  const dispatch = useDispatch();
   return (
     <View style={styles.mv10}>
       <View style={styles.flexRow}>
@@ -39,7 +41,15 @@ const CmtForm = ({
           </View>
           <View style={styles.flexRow}>
             <Text style={styles.color9c9c9c}>{timeComment}</Text>
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                dispatch(
+                  dataActions.focusReplyUser({
+                    idFocusRep: idComment,
+                    idUserComment,
+                  }),
+                );
+              }}>
               <Text style={styles.color9c9c9c}>Trả lời</Text>
             </TouchableOpacity>
           </View>
@@ -76,7 +86,15 @@ const CmtForm = ({
                       <Text style={styles.color9c9c9c}>
                         {item.item.timeRepComment}
                       </Text>
-                      <TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => {
+                          dispatch(
+                            dataActions.focusReplyUser({
+                              idFocusRep: idComment,
+                              idUserComment,
+                            }),
+                          );
+                        }}>
                         <Text style={styles.color9c9c9c}>Trả lời</Text>
                       </TouchableOpacity>
                     </View>

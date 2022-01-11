@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useEffect } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import {
   ScrollView,
   View,
@@ -9,11 +9,31 @@ import {
   StyleSheet,
   TextInput,
   Alert,
+  Keyboard,
 } from 'react-native';
+import { launchImageLibrary } from 'react-native-image-picker';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useDispatch } from 'react-redux';
+import ImagePost from '../components/imagePost';
 import { Icon } from '../core/icon';
 
 const CreatePost = () => {
+  const [picture, setPicture] = useState([]);
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const safeAreaInsets = useSafeAreaInsets();
+
+  const [keyboardHeight, setKeyboardHeight] = useState(safeAreaInsets.bottom);
+
+  useEffect(() => {
+    Keyboard.addListener('keyboardDidShow', e => {
+      setKeyboardHeight(e.endCoordinates.height);
+    });
+
+    Keyboard.addListener('keyboardWillHide', () => {
+      setKeyboardHeight(0 + safeAreaInsets.bottom);
+    });
+  }, []);
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -44,21 +64,51 @@ const CreatePost = () => {
       ),
     });
   });
+  const uploadImage = () => {
+    let options = {
+      title: 'Select Image',
+      storageOptions: {
+        skipBackup: true,
+        path: 'images',
+      },
+    };
+    // console.log(ImagePicker);
+    launchImageLibrary(options, response => {
+      if (response.didCancel) {
+        console.log('user cancelled image picker');
+      } else if (response.errorMessage) {
+        console.log('image picker error', response.errorMessage);
+      } else {
+        setPicture([...picture, response.assets[0].uri]);
+      }
+    });
+  };
+
   return (
-    <ScrollView>
-      <View style={styles.c147}>
-        <Image source={{}} style={styles.avaUser} />
-        <Text style={styles.marginTop}>Chiến</Text>
-      </View>
-      <View style={styles.backgroundWhite}>
-        <TextInput
-          style={styles.color9c9c9c}
-          placeholder="Bạn đang nghĩ gì?"
-          multiline={true}
-        />
-      </View>
-      <View style={styles.c147}>
-        <TouchableOpacity style={styles.optionBar}>
+    <Fragment>
+      <ScrollView>
+        <View style={styles.c147}>
+          <Image
+            source={{ uri: 'https://i.pravatar.cc/30' }}
+            style={styles.avaUser}
+          />
+          <Text style={styles.marginTop}>Chiến</Text>
+        </View>
+        <View style={styles.backgroundWhite}>
+          <TextInput
+            style={styles.color9c9c9c}
+            placeholder="Bạn đang nghĩ gì?"
+            multiline={true}
+          />
+          <ImagePost images={picture} />
+        </View>
+      </ScrollView>
+      <View style={[styles.c159, { paddingBottom: keyboardHeight + 40 }]}>
+        <TouchableOpacity
+          style={styles.optionBar}
+          onPress={() => {
+            uploadImage();
+          }}>
           <Image source={Icon.Image} style={styles.iconUpPost} />
           <Text>Ảnh</Text>
         </TouchableOpacity>
@@ -71,7 +121,7 @@ const CreatePost = () => {
           <Text>Sản phẩm</Text>
         </TouchableOpacity>
       </View>
-    </ScrollView>
+    </Fragment>
   );
 };
 
@@ -113,7 +163,19 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   backgroundColor: { backgroundColor: '#dedede' },
-  c147: { flexDirection: 'row', backgroundColor: 'white' },
+  c147: {
+    flexDirection: 'row',
+    backgroundColor: 'white',
+  },
+  c159: {
+    flexDirection: 'row',
+    backgroundColor: 'white',
+    position: 'absolute',
+    height: 50,
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
   marginTop: { marginTop: 20 },
   btnPost: {
     width: 60,
@@ -123,5 +185,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  
 });
