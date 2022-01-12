@@ -1,11 +1,10 @@
 //import { useNavigation } from '@react-navigation/native';
 import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import BtnLike from '../components/btnLike';
 import Line from '../components/line';
 import PostForm from '../components/postForm';
 import PostStatus from '../components/postStatus';
-import { Icon } from '../core/icon';
 
 const PostDetail = () => {
   //const navigation = useNavigation();

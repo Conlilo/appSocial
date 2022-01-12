@@ -83,7 +83,7 @@ const PostComment = () => {
             </View>
 
             <PostStatus
-              numCommentPost={dataPostDetail[0].numComment}
+              numCommentPost={dataPostDetail[0].commentDetail.length}
               numLikePost={dataPostDetail[0].numLike}
               active={active}
             />

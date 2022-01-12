@@ -1,6 +1,4 @@
-import { StackRouter } from '@react-navigation/native';
 import { createSlice } from '@reduxjs/toolkit';
-import { ActionSheetIOS } from 'react-native';
 
 const initialState = {
   dataPost: [
@@ -14,8 +12,7 @@ const initialState = {
         'https://picsum.photos/300',
         'https://picsum.photos/300',
       ],
-      numLike: 10,
-      numComment: 2,
+      numLike: [...Array(10)],
       commentDetail: [
         {
           idComment: 1,
@@ -60,8 +57,7 @@ const initialState = {
         'https://picsum.photos/300',
         'https://picsum.photos/300',
       ],
-      numLike: 4,
-      numComment: 4,
+      numLike: [...Array(4)],
       commentDetail: [
         {
           idComment: 1,
@@ -99,8 +95,7 @@ const initialState = {
       timePost: '30 phút trước',
       titlePost: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. ',
       imagePost: ['https://picsum.photos/300'],
-      numLike: 0,
-      numComment: 2,
+      numLike: [...Array(2)],
       commentDetail: [
         {
           idComment: 1,
@@ -140,8 +135,7 @@ const initialState = {
       timePost: '1 phút trước',
       titlePost: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. ',
       imagePost: ['https://picsum.photos/300', 'https://picsum.photos/300'],
-      numLike: 1,
-      numComment: 4,
+      numLike: [...Array(1)],
       commentDetail: [
         {
           idComment: 1,
@@ -176,8 +170,7 @@ const initialState = {
         'https://picsum.photos/300',
         'https://picsum.photos/300',
       ],
-      numLike: 0,
-      numComment: 0,
+      numLike: [],
       commentDetail: [],
     },
   ],
@@ -185,32 +178,42 @@ const initialState = {
     {
       id: 1,
       name: 'Chiến Nguyễn',
+      username: '0984298754',
+      password: '123456',
       postLiked: [1, 3, 5],
-      avatar: 'https://i.pravatar.cc/30',
+      avatar: 'https://i.pravatar.cc/30?img=1',
     },
     {
       id: 2,
       name: 'Hoàng',
+      username: '0123456789',
+      password: '123456',
       postLiked: [],
-      avatar: 'https://i.pravatar.cc/30',
+      avatar: 'https://i.pravatar.cc/30?img=2',
     },
     {
       id: 3,
       name: 'Dương Đạt',
+      username: '0147258369',
+      password: '123456',
       postLiked: [],
-      avatar: 'https://i.pravatar.cc/30',
+      avatar: 'https://i.pravatar.cc/30?img=3',
     },
     {
       id: 4,
       name: 'Dương',
+      username: '0987654321',
+      password: '123456',
       postLiked: [],
-      avatar: 'https://i.pravatar.cc/30',
+      avatar: 'https://i.pravatar.cc/30?img=4',
     },
     {
       id: 5,
       name: 'Kiên',
+      username: '0369258147',
+      password: '123456',
       postLiked: [],
-      avatar: 'https://i.pravatar.cc/30',
+      avatar: 'https://i.pravatar.cc/30?img=5',
     },
   ],
   store: [],
@@ -218,6 +221,17 @@ const initialState = {
   idKeyComment: 100,
   idUserRep: 0,
   idCommentRep: 0,
+  isLogin: false,
+  accountLogin: {},
+};
+
+const Login = (state, action) => {
+  state.isLogin = true;
+  state.accountLogin = action.payload.userDispatch;
+};
+
+const Logout = state => {
+  state.isLogin = false;
 };
 
 const focusReplyUser = (state, action) => {
@@ -238,12 +252,9 @@ const addPost = (state, action) => {
     titlePost: '',
     imagePost: [],
     numLike: 0,
-    numComment: 0,
     commentDetail: [],
   });
 };
-
-const testAction = () => {};
 
 const addCommentPost = (state, action) => {
   state.store
@@ -276,14 +287,19 @@ const publicStore = state => {
 };
 
 const likedPost = (state, action) => {
-  state.dataUser[0].postLiked.push(action.payload.idPost);
+  state.store
+    .filter(x => x.id === action.payload.idPost)[0]
+    .numLike.push(state.accountLogin.id);
 };
 
 const dislikedPost = (state, action) => {
-  state.dataUser[0].postLiked = state.dataUser[0].postLiked.filter(
-    x => x !== action.payload.idPost,
-  );
+  state.store.filter(x => x.id === action.payload.idPost)[0].numLike =
+    state.store
+      .filter(x => x.id === action.payload.idPost)[0]
+      .numLike.filter(x => x !== state.accountLogin.id);
 };
+
+const testAction = () => {};
 
 const dataSlice = createSlice({
   name: 'data',
@@ -297,6 +313,8 @@ const dataSlice = createSlice({
     focusReplyUser,
     addReplyComment,
     addPost,
+    Login,
+    Logout,
     testAction,
   },
 });

@@ -1,3 +1,3 @@
 export enum AppImage {
-  Test = require('../assets/image/test.png'),
+  Logo = require('../assets/image/Logo.png'),
 }
