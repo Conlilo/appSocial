@@ -4,6 +4,7 @@ import {
   FlatList,
   Image,
   Keyboard,
+  Platform,
   StyleSheet,
   Text,
   TextInput,
@@ -76,9 +77,11 @@ const PostComment = () => {
               idPost={idPost}
             />
             <View>
-              <TouchableOpacity
-                onPress={() => navigation.navigate('PostDetail')}>
-                <ImagePost images={dataPostDetail[0].imagePost} />
+              <TouchableOpacity>
+                <ImagePost
+                  imagesPost={dataPostDetail[0].imagePost}
+                  disable={false}
+                />
               </TouchableOpacity>
             </View>
 
@@ -104,7 +107,14 @@ const PostComment = () => {
         // eslint-disable-next-line react-native/no-inline-styles
         style={{ marginBottom: 80 }}
       />
-      <View style={[styles.createComment, { paddingBottom: keyboardHeight }]}>
+      <View
+        style={[
+          styles.createComment,
+          Platform.OS === 'ios'
+            ? { paddingBottom: keyboardHeight }
+            : // eslint-disable-next-line react-native/no-inline-styles
+              { bottom: 25 },
+        ]}>
         {idFocusRep === 0 ? (
           <View />
         ) : (
@@ -125,33 +135,40 @@ const PostComment = () => {
             </TouchableOpacity>
           </View>
         )}
-        <View style={[styles.btnComment, { paddingBottom: keyboardHeight }]}>
-          <TextInput
-            style={styles.inputText}
-            placeholder="Viết bình luận"
-            onChangeText={text => setComment(text)}
-            value={comment}
-          />
-          <TouchableOpacity
-            onPress={() => {
-              if (idFocusRep === 0) {
-                if (comment !== '') {
-                  dispatch(dataActions.addCommentPost({ idPost, comment }));
-                }
-              } else {
-                dispatch(
-                  dataActions.addReplyComment({
-                    comment,
-                    idPost,
-                    idCommentRep,
-                  }),
-                );
-                setComment('');
+      </View>
+      <View
+        style={[
+          styles.btnComment,
+          Platform.OS === 'ios'
+            ? { paddingBottom: keyboardHeight }
+            : // eslint-disable-next-line react-native/no-inline-styles
+              { bottom: 25 },
+        ]}>
+        <TextInput
+          style={styles.inputText}
+          placeholder="Viết bình luận"
+          onChangeText={text => setComment(text)}
+          value={comment}
+        />
+        <TouchableOpacity
+          onPress={() => {
+            if (idFocusRep === 0) {
+              if (comment !== '') {
+                dispatch(dataActions.addCommentPost({ idPost, comment }));
               }
-            }}>
-            <Image source={Icon.Send} style={styles.iconSend} />
-          </TouchableOpacity>
-        </View>
+            } else {
+              dispatch(
+                dataActions.addReplyComment({
+                  comment,
+                  idPost,
+                  idCommentRep,
+                }),
+              );
+              setComment('');
+            }
+          }}>
+          <Image source={Icon.Send} style={styles.iconSend} />
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -170,7 +187,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: 'white',
   },
   createComment: {
     flexDirection: 'row',
@@ -204,6 +220,7 @@ const styles = StyleSheet.create({
   },
   stylePost: {
     backgroundColor: 'white',
+    height: '100%',
   },
   imgPost: {
     width: '100%',

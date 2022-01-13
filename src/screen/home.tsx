@@ -31,6 +31,7 @@ const Home = () => {
         renderItem={({ item }) => {
           return (
             <PostSocial
+              idAccountPost={item.idUser}
               titlePost={item.titlePost}
               accountPost={user.filter(x => x.id === item.idUser)[0].name}
               timePost={item.timePost}

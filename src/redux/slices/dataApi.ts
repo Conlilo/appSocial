@@ -8,9 +8,9 @@ const initialState = {
       timePost: '1 ngày trước',
       titlePost: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. ',
       imagePost: [
-        'https://picsum.photos/300',
-        'https://picsum.photos/300',
-        'https://picsum.photos/300',
+        'https://picsum.photos/id/1/300',
+        'https://picsum.photos/id/2/300',
+        'https://picsum.photos/id/3/300',
       ],
       numLike: [...Array(10)],
       commentDetail: [
@@ -50,12 +50,12 @@ const initialState = {
       timePost: '1 ngày trước',
       titlePost: 'Lorem ipsum dolor sit amet,',
       imagePost: [
-        'https://picsum.photos/300',
-        'https://picsum.photos/300',
-        'https://picsum.photos/300',
-        'https://picsum.photos/300',
-        'https://picsum.photos/300',
-        'https://picsum.photos/300',
+        'https://picsum.photos/id/4/300',
+        'https://picsum.photos/id/5/300',
+        'https://picsum.photos/id/6/300',
+        'https://picsum.photos/id/7/300',
+        'https://picsum.photos/id/8/300',
+        'https://picsum.photos/id/9/300',
       ],
       numLike: [...Array(4)],
       commentDetail: [
@@ -94,7 +94,7 @@ const initialState = {
       idUser: 2,
       timePost: '30 phút trước',
       titlePost: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. ',
-      imagePost: ['https://picsum.photos/300'],
+      imagePost: ['https://picsum.photos/id/10/300'],
       numLike: [...Array(2)],
       commentDetail: [
         {
@@ -134,7 +134,10 @@ const initialState = {
       idUser: 4,
       timePost: '1 phút trước',
       titlePost: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. ',
-      imagePost: ['https://picsum.photos/300', 'https://picsum.photos/300'],
+      imagePost: [
+        'https://picsum.photos/id/11/300',
+        'https://picsum.photos/id/12/300',
+      ],
       numLike: [...Array(1)],
       commentDetail: [
         {
@@ -158,17 +161,17 @@ const initialState = {
       timePost: 'Vừa xong',
       titlePost: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. ',
       imagePost: [
-        'https://picsum.photos/300',
-        'https://picsum.photos/300',
-        'https://picsum.photos/300',
-        'https://picsum.photos/300',
-        'https://picsum.photos/300',
-        'https://picsum.photos/300',
-        'https://picsum.photos/300',
-        'https://picsum.photos/300',
-        'https://picsum.photos/300',
-        'https://picsum.photos/300',
-        'https://picsum.photos/300',
+        'https://picsum.photos/id/13/300',
+        'https://picsum.photos/id/14/300',
+        'https://picsum.photos/id/15/300',
+        'https://picsum.photos/id/16/300',
+        'https://picsum.photos/id/17/300',
+        'https://picsum.photos/id/18/300',
+        'https://picsum.photos/id/19/300',
+        'https://picsum.photos/id/20/300',
+        'https://picsum.photos/id/21/300',
+        'https://picsum.photos/id/22/300',
+        'https://picsum.photos/id/23/300',
       ],
       numLike: [],
       commentDetail: [],
@@ -223,6 +226,29 @@ const initialState = {
   idCommentRep: 0,
   isLogin: false,
   accountLogin: {},
+  imageCreate: [],
+};
+
+const addPost = (state, action) => {
+  state.store.push({
+    id: state.idKeyPost,
+    idUser: action.payload.userLogin,
+    timePost: 'Vừa xong',
+    titlePost: action.payload.titlePost,
+    imagePost: state.imageCreate,
+    numLike: [],
+    commentDetail: [],
+  });
+  state.idKeyPost += 1;
+  state.imageCreate = [];
+};
+
+const addImageCreate = (state, action) => {
+  state.imageCreate.push(action.payload);
+};
+
+const delImageCreate = (state, action) => {
+  state.imageCreate = state.imageCreate.filter(x => x !== action.payload);
 };
 
 const Login = (state, action) => {
@@ -242,18 +268,6 @@ const focusReplyUser = (state, action) => {
 const defocusReplyUser = state => {
   state.idCommentRep = 0;
   state.idUserRep = 0;
-};
-
-const addPost = (state, action) => {
-  state.store.push({
-    id: 5,
-    idUser: 1,
-    timePost: 'Vừa xong',
-    titlePost: '',
-    imagePost: [],
-    numLike: 0,
-    commentDetail: [],
-  });
 };
 
 const addCommentPost = (state, action) => {
@@ -315,7 +329,9 @@ const dataSlice = createSlice({
     addPost,
     Login,
     Logout,
+    addImageCreate,
     testAction,
+    delImageCreate,
   },
 });
 

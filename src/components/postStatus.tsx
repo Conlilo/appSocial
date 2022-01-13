@@ -26,7 +26,9 @@ const PostStatus = ({
         <Text style={styles.color9c9c9c}>
           {numLikePost > 0
             ? active
-              ? `Bạn và ${numLikePost - 1} người khác`
+              ? numLikePost - 1 === 0
+                ? 'Bạn'
+                : `Bạn và ${numLikePost - 1} người khác`
               : `${numLikePost} người khác`
             : active
             ? 'Bạn'

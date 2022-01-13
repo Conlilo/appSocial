@@ -1,6 +1,6 @@
 //import { useNavigation } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
-import React from 'react';
+import React, { useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import BtnLike from '../components/btnLike';
 import ImagePost from '../components/imagePost';
@@ -20,6 +20,7 @@ const PostSocial = ({
   numLikePost,
   active,
   idPost,
+  idAccountPost,
 }: {
   titlePost: string;
   accountPost: string;
@@ -30,6 +31,7 @@ const PostSocial = ({
   avaPost: string;
   active: boolean;
   idPost: number;
+  idAccountPost: number;
 }) => {
   const navigation = useNavigation();
   return (
@@ -41,10 +43,11 @@ const PostSocial = ({
         avaPost={avaPost}
         idPost={idPost}
         active={active}
+        idAccountPost={idAccountPost}
       />
       {/* eslint-disable-next-line react-native/no-inline-styles*/}
       <View style={{ flex: 1, marginLeft: 5 }}>
-        <ImagePost images={image} />
+        <ImagePost imagesPost={image} disable={false} />
       </View>
       <PostStatus
         active={active}

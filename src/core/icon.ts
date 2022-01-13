@@ -9,4 +9,7 @@ export enum Icon {
   Send = require('../assets/icons/IconSend.png'),
   ArrowLeft = require('../assets/icons/arrow-left.png'),
   Xicon = require('../assets/icons/x.png'),
+  Option = require('../assets/icons/Vector.png'),
+  Edit = require('../assets/icons/Edit.png'),
+  Delete = require('../assets/icons/Trash.png'),
 }

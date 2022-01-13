@@ -1,4 +1,4 @@
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import React, { Fragment, useEffect, useState } from 'react';
 import {
   ScrollView,
@@ -10,18 +10,24 @@ import {
   TextInput,
   Alert,
   Keyboard,
+  Platform,
 } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import ImagePost from '../components/imagePost';
 import { Icon } from '../core/icon';
+import { dataActions } from '../redux/slices/dataApi';
 
 const CreatePost = () => {
-  const [picture, setPicture] = useState([]);
   const navigation = useNavigation();
+  const route = useRoute();
+  console.log(route?.params);
   const dispatch = useDispatch();
   const safeAreaInsets = useSafeAreaInsets();
+  const userLogin = useSelector(state => state.data.accountLogin);
+  const [titlePost, setTitlePost] = useState('');
+  const picture = useSelector(state => state.data.imageCreate);
 
   const [keyboardHeight, setKeyboardHeight] = useState(safeAreaInsets.bottom);
 
@@ -34,10 +40,18 @@ const CreatePost = () => {
       setKeyboardHeight(0 + safeAreaInsets.bottom);
     });
   }, []);
+
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity style={styles.btnPost}>
+        <TouchableOpacity
+          style={styles.btnPost}
+          onPress={() => {
+            dispatch(
+              dataActions.addPost({ titlePost, userLogin: userLogin.id }),
+            );
+            navigation.navigate('Home');
+          }}>
           <Text style={styles.colorWhite}>Đăng</Text>
         </TouchableOpacity>
       ),
@@ -63,7 +77,8 @@ const CreatePost = () => {
         </TouchableOpacity>
       ),
     });
-  });
+  }, [titlePost]);
+
   const uploadImage = () => {
     let options = {
       title: 'Select Image',
@@ -72,14 +87,13 @@ const CreatePost = () => {
         path: 'images',
       },
     };
-    // console.log(ImagePicker);
     launchImageLibrary(options, response => {
       if (response.didCancel) {
         console.log('user cancelled image picker');
       } else if (response.errorMessage) {
         console.log('image picker error', response.errorMessage);
       } else {
-        setPicture([...picture, response.assets[0].uri]);
+        dispatch(dataActions.addImageCreate(response.assets[0].uri));
       }
     });
   };
@@ -88,22 +102,30 @@ const CreatePost = () => {
     <Fragment>
       <ScrollView>
         <View style={styles.c147}>
-          <Image
-            source={{ uri: 'https://i.pravatar.cc/30' }}
-            style={styles.avaUser}
-          />
-          <Text style={styles.marginTop}>Chiến</Text>
+          <Image source={{ uri: userLogin.avatar }} style={styles.avaUser} />
+          <Text style={styles.marginTop}>{userLogin.name}</Text>
         </View>
         <View style={styles.backgroundWhite}>
           <TextInput
             style={styles.color9c9c9c}
             placeholder="Bạn đang nghĩ gì?"
             multiline={true}
+            onChangeText={item => setTitlePost(item)}
+            value={titlePost}
           />
-          <ImagePost images={picture} />
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate('CreateImagePost');
+            }}>
+            <ImagePost imagesPost={picture} disable={true} />
+          </TouchableOpacity>
         </View>
       </ScrollView>
-      <View style={[styles.c159, { paddingBottom: keyboardHeight + 40 }]}>
+      <View
+        style={[
+          styles.c159,
+          Platform.OS === 'ios' ? { paddingBottom: keyboardHeight + 40 } : {},
+        ]}>
         <TouchableOpacity
           style={styles.optionBar}
           onPress={() => {

@@ -1,5 +1,5 @@
-import { useNavigation } from '@react-navigation/native';
-import React, { Fragment } from 'react';
+import React, { Fragment, useState } from 'react';
+import ImageView from 'react-native-image-viewing';
 import {
   Dimensions,
   Image,
@@ -10,43 +10,62 @@ import {
 } from 'react-native';
 
 interface ImagePost {
-  images: Array<string>;
+  imagesPost: Array<string>;
+  disable: boolean;
 }
 
-const ImagePost = ({ images }: ImagePost) => {
-  const navigation = useNavigation();
+const ImagePost = ({ imagesPost, disable }: ImagePost) => {
+  const [visible, setVisible] = useState(false);
+  const [indexState, setIndexState] = useState(0);
 
-  if (images.length === 0) {
+  const imgView = (index: number) => {
+    setVisible(true);
+    setIndexState(index);
+    console.log(imagesPost.map(x => ({ uri: x })));
+    console.log(index);
+  };
+
+  if (imagesPost.length === 0) {
     return <View />;
   }
 
-  if (images.length === 1) {
+  if (imagesPost.length === 1) {
     return (
-      <TouchableOpacity
-        onPress={() => navigation.navigate('PostDetail')}
-        style={styles.flex1}>
-        <Image
-          source={{ uri: images[0] }}
-          style={[
-            // eslint-disable-next-line react-native/no-inline-styles
-            {
-              width: Dimensions.get('window').width,
-              aspectRatio: 1,
-            },
-          ]}
+      <>
+        <TouchableOpacity
+          onPress={() => imgView(0)}
+          style={styles.flex1}
+          disabled={disable}>
+          <Image
+            source={{ uri: imagesPost[0] }}
+            style={[
+              // eslint-disable-next-line react-native/no-inline-styles
+              {
+                width: Dimensions.get('window').width,
+                aspectRatio: 1,
+              },
+            ]}
+          />
+        </TouchableOpacity>
+        <ImageView
+          images={imagesPost.map(x => ({ uri: x }))}
+          imageIndex={indexState}
+          visible={visible}
+          onRequestClose={() => setVisible(false)}
         />
-      </TouchableOpacity>
+      </>
     );
   }
 
-  if (images.length === 2) {
+  if (imagesPost.length === 2) {
     return (
       <View style={styles.flexRow}>
         <TouchableOpacity
-          onPress={() => navigation.navigate('PostDetail')}
-          style={styles.flex1}>
+          onPress={() => imgView(0)}
+          style={styles.flex1}
+          disabled={disable}>
           <Image
-            source={{ uri: images[0] }}
+            source={{ uri: imagesPost[0] }}
             style={[
               // eslint-disable-next-line react-native/no-inline-styles
               {
@@ -57,10 +76,11 @@ const ImagePost = ({ images }: ImagePost) => {
           />
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => navigation.navigate('PostDetail')}
-          style={styles.flex1}>
+          onPress={() => imgView(1)}
+          style={styles.flex1}
+          disabled={disable}>
           <Image
-            source={{ uri: images[1] }}
+            source={{ uri: imagesPost[1] }}
             style={[
               // eslint-disable-next-line react-native/no-inline-styles
               {
@@ -70,17 +90,24 @@ const ImagePost = ({ images }: ImagePost) => {
             ]}
           />
         </TouchableOpacity>
+        <ImageView
+          images={imagesPost.map(x => ({ uri: x }))}
+          imageIndex={indexState}
+          visible={visible}
+          onRequestClose={() => setVisible(false)}
+        />
       </View>
     );
   }
-  if (images.length >= 3) {
+  if (imagesPost.length >= 3) {
     return (
       <View>
         <TouchableOpacity
-          onPress={() => navigation.navigate('PostDetail')}
-          style={styles.flex1}>
+          onPress={() => imgView(0)}
+          style={styles.flex1}
+          disabled={disable}>
           <Image
-            source={{ uri: images[0] }}
+            source={{ uri: imagesPost[0] }}
             style={[
               {
                 width: Dimensions.get('window').width,
@@ -91,10 +118,11 @@ const ImagePost = ({ images }: ImagePost) => {
         </TouchableOpacity>
         <View style={styles.flexRow}>
           <TouchableOpacity
-            onPress={() => navigation.navigate('PostDetail')}
-            style={styles.flex1}>
+            onPress={() => imgView(1)}
+            style={styles.flex1}
+            disabled={disable}>
             <Image
-              source={{ uri: images[1] }}
+              source={{ uri: imagesPost[1] }}
               style={[
                 // eslint-disable-next-line react-native/no-inline-styles
                 {
@@ -106,7 +134,7 @@ const ImagePost = ({ images }: ImagePost) => {
           </TouchableOpacity>
 
           <View>
-            {images.length > 3 ? (
+            {imagesPost.length > 3 ? (
               <View
                 // eslint-disable-next-line react-native/no-inline-styles
                 style={{
@@ -127,17 +155,18 @@ const ImagePost = ({ images }: ImagePost) => {
                     fontSize: 48,
                     alignSelf: 'center',
                   }}>
-                  +{images.length - 3}
+                  +{imagesPost.length - 3}
                 </Text>
               </View>
             ) : (
               <Fragment />
             )}
             <TouchableOpacity
-              onPress={() => navigation.navigate('PostDetail')}
-              style={styles.flex1}>
+              onPress={() => imgView(2)}
+              style={styles.flex1}
+              disabled={disable}>
               <Image
-                source={{ uri: images[2] }}
+                source={{ uri: imagesPost[2] }}
                 style={[
                   // eslint-disable-next-line react-native/no-inline-styles
                   {
@@ -149,6 +178,12 @@ const ImagePost = ({ images }: ImagePost) => {
             </TouchableOpacity>
           </View>
         </View>
+        <ImageView
+          images={imagesPost.map(x => ({ uri: x }))}
+          imageIndex={indexState}
+          visible={visible}
+          onRequestClose={() => setVisible(false)}
+        />
       </View>
     );
   }
