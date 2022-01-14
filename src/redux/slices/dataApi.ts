@@ -183,15 +183,13 @@ const initialState = {
       name: 'Chiến Nguyễn',
       username: '0984298754',
       password: '123456',
-      postLiked: [1, 3, 5],
       avatar: 'https://i.pravatar.cc/30?img=1',
     },
     {
       id: 2,
       name: 'Hoàng',
-      username: '0123456789',
-      password: '123456',
-      postLiked: [],
+      username: '0974793852',
+      password: '1234567',
       avatar: 'https://i.pravatar.cc/30?img=2',
     },
     {
@@ -199,7 +197,6 @@ const initialState = {
       name: 'Dương Đạt',
       username: '0147258369',
       password: '123456',
-      postLiked: [],
       avatar: 'https://i.pravatar.cc/30?img=3',
     },
     {
@@ -207,7 +204,6 @@ const initialState = {
       name: 'Dương',
       username: '0987654321',
       password: '123456',
-      postLiked: [],
       avatar: 'https://i.pravatar.cc/30?img=4',
     },
     {
@@ -215,8 +211,14 @@ const initialState = {
       name: 'Kiên',
       username: '0369258147',
       password: '123456',
-      postLiked: [],
       avatar: 'https://i.pravatar.cc/30?img=5',
+    },
+    {
+      id: 6,
+      name: 'Văn Sĩ',
+      username: '0978226026',
+      password: '1234567',
+      avatar: 'https://i.pravatar.cc/30?img=6',
     },
   ],
   store: [],
@@ -227,6 +229,7 @@ const initialState = {
   isLogin: false,
   accountLogin: {},
   imageCreate: [],
+  token: '',
 };
 
 const addPost = (state, action) => {
@@ -269,6 +272,10 @@ const delImageCreate = (state, action) => {
 const Login = (state, action) => {
   state.isLogin = true;
   state.accountLogin = action.payload.userDispatch;
+};
+
+const Token = (state, action) => {
+  state.token = action.payload.response;
 };
 
 const Logout = state => {
@@ -350,6 +357,7 @@ const dataSlice = createSlice({
     editPost,
     clearData,
     delPost,
+    Token,
   },
 });
 

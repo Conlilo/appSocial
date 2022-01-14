@@ -46,7 +46,7 @@ const PostSocial = ({
         idAccountPost={idAccountPost}
       />
       {/* eslint-disable-next-line react-native/no-inline-styles*/}
-      <View style={{ flex: 1, marginLeft: 5 }}>
+      <View style={{ flex: 1 }}>
         <ImagePost imagesPost={image} disable={false} />
       </View>
       <PostStatus
