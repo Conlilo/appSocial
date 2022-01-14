@@ -155,6 +155,7 @@ const PostComment = () => {
             if (idFocusRep === 0) {
               if (comment !== '') {
                 dispatch(dataActions.addCommentPost({ idPost, comment }));
+                setComment('');
               }
             } else {
               dispatch(

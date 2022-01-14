@@ -22,14 +22,24 @@ import { dataActions } from '../redux/slices/dataApi';
 const CreatePost = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  console.log(route?.params);
+  const postEdit = useSelector(
+    state => state.data.store.filter(x => x.id === route?.params)[0],
+  );
   const dispatch = useDispatch();
   const safeAreaInsets = useSafeAreaInsets();
   const userLogin = useSelector(state => state.data.accountLogin);
   const [titlePost, setTitlePost] = useState('');
+  const [imgPost, setImgPost] = useState([]);
   const picture = useSelector(state => state.data.imageCreate);
-
   const [keyboardHeight, setKeyboardHeight] = useState(safeAreaInsets.bottom);
+
+  if (postEdit) {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useEffect(() => {
+      postEdit.imagePost.map(x => dispatch(dataActions.addImageCreate(x)));
+      setTitlePost(postEdit.titlePost);
+    }, []);
+  }
 
   useEffect(() => {
     Keyboard.addListener('keyboardDidShow', e => {
@@ -47,12 +57,21 @@ const CreatePost = () => {
         <TouchableOpacity
           style={styles.btnPost}
           onPress={() => {
-            dispatch(
-              dataActions.addPost({ titlePost, userLogin: userLogin.id }),
-            );
+            postEdit
+              ? dispatch(
+                  dataActions.editPost({ titlePost, idPost: postEdit.id }),
+                )
+              : dispatch(
+                  dataActions.addPost({ titlePost, userLogin: userLogin.id }),
+                );
             navigation.navigate('Home');
+            setImgPost([]);
+            setTitlePost('');
+            dispatch(dataActions.clearData());
           }}>
-          <Text style={styles.colorWhite}>Đăng</Text>
+          <Text style={styles.colorWhite}>
+            {postEdit ? 'Cập nhật' : 'Đăng'}
+          </Text>
         </TouchableOpacity>
       ),
       headerLeft: () => (
@@ -68,7 +87,10 @@ const CreatePost = () => {
                 {
                   style: 'destructive',
                   text: 'Hủy bỏ',
-                  onPress: () => navigation.navigate('Home'),
+                  onPress: () => {
+                    dispatch(dataActions.clearData());
+                    navigation.navigate('Home');
+                  },
                 },
               ],
             );
@@ -76,8 +98,13 @@ const CreatePost = () => {
           <Image source={Icon.ArrowLeft} />
         </TouchableOpacity>
       ),
+      title: postEdit ? 'Cập nhật bài viết' : 'Tạo bài viết',
     });
   }, [titlePost]);
+
+  useEffect(() => {
+    setImgPost(picture);
+  }, [picture]);
 
   const uploadImage = () => {
     let options = {
@@ -117,7 +144,7 @@ const CreatePost = () => {
             onPress={() => {
               navigation.navigate('CreateImagePost');
             }}>
-            <ImagePost imagesPost={picture} disable={true} />
+            <ImagePost imagesPost={imgPost} disable={true} />
           </TouchableOpacity>
         </View>
       </ScrollView>

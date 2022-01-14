@@ -243,6 +243,21 @@ const addPost = (state, action) => {
   state.imageCreate = [];
 };
 
+const editPost = (state, action) => {
+  state.store.filter(x => x.id === action.payload.idPost)[0].titlePost =
+    action.payload.titlePost;
+  state.store.filter(x => x.id === action.payload.idPost)[0].imagePost =
+    state.imageCreate;
+};
+
+const delPost = (state, acion) => {
+  state.store = state.store.filter(x => x.id !== acion.payload.idPost);
+};
+
+const clearData = state => {
+  state.imageCreate = [];
+};
+
 const addImageCreate = (state, action) => {
   state.imageCreate.push(action.payload);
 };
@@ -332,6 +347,9 @@ const dataSlice = createSlice({
     addImageCreate,
     testAction,
     delImageCreate,
+    editPost,
+    clearData,
+    delPost,
   },
 });
 

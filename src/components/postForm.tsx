@@ -1,11 +1,19 @@
 /* eslint-disable react-native/no-inline-styles */
 import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
-import { Image, Text, View, StyleSheet, TouchableOpacity } from 'react-native';
-import { useSelector } from 'react-redux';
+import {
+  Image,
+  Text,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
 import { Icon } from '../core/icon';
 import Modal from 'react-native-modal';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { dataActions } from '../redux/slices/dataApi';
 
 const PostForm = ({
   titlePost,
@@ -28,6 +36,7 @@ const PostForm = ({
   const [modalVisible, setModalVisible] = useState(false);
   const navigation = useNavigation();
   const safeAreaInsets = useSafeAreaInsets();
+  const dispatch = useDispatch();
 
   return (
     <>
@@ -93,7 +102,21 @@ const PostForm = ({
               <Text style={styles.btnModal}>Sửa bài viết</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => setModalVisible(!modalVisible)}
+              onPress={() => {
+                setModalVisible(!modalVisible);
+                Alert.alert('Thông báo', 'Bạn có chắc muốn xóa bài viết này', [
+                  {
+                    text: 'Xóa',
+                    style: 'destructive',
+                    onPress: () => {
+                      dispatch(dataActions.delPost({ idPost }));
+                    },
+                  },
+                  {
+                    text: 'Hủy',
+                  },
+                ]);
+              }}
               style={[
                 styles.flexRow,
                 { borderBottomWidth: 1, borderBottomColor: '#9c9c9c' },
