@@ -23,16 +23,19 @@ import { Icon } from '../core/icon';
 import { dataActions } from '../redux/slices/dataApi';
 
 const PostComment = () => {
-  const navigation = useNavigation();
   const safeAreaInsets = useSafeAreaInsets();
   const route = useRoute();
   const idPost = route?.params?.idPost;
-  const active = route?.params?.active;
   const data = useSelector(state => state.data.store);
   const user = useSelector(state => state.data.dataUser);
   const idFocusRep = useSelector(state => state.data.idUserRep);
   const idCommentRep = useSelector(state => state.data.idCommentRep);
   const dataPostDetail = data.filter(x => x.id === idPost);
+  const userLogin = useSelector(state => state.data.accountLogin);
+  const active =
+    data
+      .filter(x => x.id === idPost)[0]
+      .numLike.filter(x => x === userLogin.id)[0] === userLogin.id;
   const dispatch = useDispatch();
   const [comment, setComment] = useState('');
 
@@ -86,15 +89,15 @@ const PostComment = () => {
             </View>
 
             <PostStatus
-              numCommentPost={dataPostDetail[0].commentDetail.length}
-              numLikePost={dataPostDetail[0].numLike}
               active={active}
+              numCommentPost={dataPostDetail[0].commentDetail.length}
+              numLikePost={dataPostDetail[0].numLike.length}
             />
 
             <Line />
 
             <View style={styles.interactiveBar}>
-              <BtnLike idPost={idPost} active={active} />
+              <BtnLike active={active} idPost={idPost} />
               <TouchableOpacity style={styles.flexRow}>
                 <Image source={Icon.Comment} style={styles.marginRight} />
                 <Text style={styles.alignCenter}>Bình luận</Text>
@@ -154,7 +157,13 @@ const PostComment = () => {
           onPress={() => {
             if (idFocusRep === 0) {
               if (comment !== '') {
-                dispatch(dataActions.addCommentPost({ idPost, comment }));
+                dispatch(
+                  dataActions.addCommentPost({
+                    idPost,
+                    comment,
+                    idUser: userLogin.id,
+                  }),
+                );
                 setComment('');
               }
             } else {
@@ -163,6 +172,7 @@ const PostComment = () => {
                   comment,
                   idPost,
                   idCommentRep,
+                  idUser: userLogin.id,
                 }),
               );
               setComment('');

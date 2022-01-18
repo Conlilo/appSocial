@@ -77,42 +77,33 @@ const Login = () => {
         />
         <TouchableOpacity
           style={styles.loginButton}
-          onPress={() => {
-            hannderVerification(username, password);
+          onPress={async () => {
             const bodyFromData = new FormData();
             bodyFromData.append('userName', username);
             bodyFromData.append('client_Id', 'cuccumobile');
             bodyFromData.append('client_secret', 'cucumobile_secret');
             bodyFromData.append('grant_type', 'password');
             bodyFromData.append('password', password);
-            axios({
+            await axios({
               method: 'post',
               // eslint-disable-next-line quotes
               url: `https://devaccount.cuccu.vn/connect/token`,
               data: bodyFromData,
               headers: {
                 'Content-Type': 'multipart/form-data',
-                Authorization: 'Bearer <token>',
               },
             })
               .then(function (response) {
                 //handle success
-                console.log('dât', response);
-                dispatch(dataActions.Token({ response }));
+                dispatch(
+                  dataActions.Token({ response: response.data.access_token }),
+                );
               })
               .catch(function (error) {
                 //handle error
                 console.log('error', error);
-                // Alert.alert(
-                //   'Đăng nhập thất bại',
-                //   'Số điện thoại và mật khẩu sai vui lòng kiểm lại',
-                //   [
-                //     {
-                //       text: 'OK',
-                //     },
-                //   ],
-                // );
               });
+            hannderVerification(username, password);
           }}>
           <Text style={styles.buttunLogin}>ĐĂNG NHẬP</Text>
         </TouchableOpacity>

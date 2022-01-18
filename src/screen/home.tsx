@@ -71,7 +71,9 @@ const Home = () => {
             <View style={styles.c147}>
               <TouchableOpacity
                 style={styles.optionBar}
-                onPress={() => navigation.navigate('CreatePost')}>
+                onPress={() =>
+                  navigation.navigate('CreatePost', { upImage: true })
+                }>
                 <Image source={Icon.Image} style={styles.iconUpPost} />
                 <Text>Ảnh</Text>
               </TouchableOpacity>

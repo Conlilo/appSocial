@@ -222,6 +222,7 @@ const initialState = {
     },
   ],
   store: [],
+  realStore: [],
   idKeyPost: 100,
   idKeyComment: 100,
   idUserRep: 0,
@@ -230,6 +231,7 @@ const initialState = {
   accountLogin: {},
   imageCreate: [],
   token: '',
+  avatar: '',
 };
 
 const addPost = (state, action) => {
@@ -297,7 +299,7 @@ const addCommentPost = (state, action) => {
     .filter(x => x.id === action.payload.idPost)[0]
     .commentDetail.push({
       idComment: state.idKeyPost,
-      idUserComment: 1,
+      idUserComment: action.payload.idUser,
       titleComment: action.payload.comment,
       timeComment: 'Vừa xong',
       repComment: [],
@@ -310,7 +312,7 @@ const addReplyComment = (state, action) => {
     .filter(x => x.id === action.payload.idPost)[0]
     .commentDetail.filter(x => x.idComment === action.payload.idCommentRep)[0]
     .repComment.push({
-      idUserRepComment: 1,
+      idUserRepComment: action.payload.idUser,
       titleRepComment: action.payload.comment,
       timeRepComment: 'Vừa xong',
     });
@@ -337,6 +339,14 @@ const dislikedPost = (state, action) => {
 
 const testAction = () => {};
 
+const Avatar = (state, action) => {
+  state.avatar = action.payload.result;
+};
+
+const addRealStore = (state, action) => {
+  state.realStore = action.payload.data;
+};
+
 const dataSlice = createSlice({
   name: 'data',
   initialState,
@@ -358,6 +368,8 @@ const dataSlice = createSlice({
     clearData,
     delPost,
     Token,
+    Avatar,
+    addRealStore,
   },
 });
 

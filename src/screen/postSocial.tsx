@@ -1,14 +1,19 @@
 //import { useNavigation } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
 import BtnLike from '../components/btnLike';
 import ImagePost from '../components/imagePost';
 import Line from '../components/line';
 import PostForm from '../components/postForm';
 import PostStatus from '../components/postStatus';
 import Space from '../components/space';
+import { fetchImageApi } from '../constants';
 import { Icon } from '../core/icon';
+import { dataActions } from '../redux/slices/dataApi';
+import getPost from '../services/post';
+import getCurrentUser from '../services/user';
 
 const PostSocial = ({
   titlePost,
@@ -34,6 +39,34 @@ const PostSocial = ({
   idAccountPost: number;
 }) => {
   const navigation = useNavigation();
+  // const dispatch = useDispatch();
+  // const userToken = useSelector(state => state.data.token);
+  // const realData = useSelector(state => state.data.realStore);
+
+  // const _getCurrentUser = async () => {
+  //   try {
+  //     const result = await getCurrentUser();
+  //     dispatch(dataActions.Avatar({ result: result.data.data.avatar }));
+  //   } catch (error) {
+  //     // error.message
+  //     dispatch(dataActions.Logout());
+  //   }
+  // };
+
+  // const _getPost = async () => {
+  //   try {
+  //     const result = await getPost();
+  //     dispatch(dataActions.addRealStore({ data: result?.data.data }));
+  //   } catch (error) {
+  //     dispatch(dataActions.Logout());
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   _getCurrentUser();
+  //   _getPost();
+  // }, [userToken]);
+
   return (
     <View style={styles.stylePost}>
       <PostForm

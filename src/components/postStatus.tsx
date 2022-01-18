@@ -13,7 +13,6 @@ const PostStatus = ({
   numLikePost: number;
   active: boolean;
 }) => {
-  // const activeBtn = useSelector(state => state.activelikebutton.active);
   return (
     <View
       style={{

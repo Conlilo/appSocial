@@ -25,6 +25,7 @@ const CreatePost = () => {
   const postEdit = useSelector(
     state => state.data.store.filter(x => x.id === route?.params)[0],
   );
+  const upImage = route?.params?.upImage;
   const dispatch = useDispatch();
   const safeAreaInsets = useSafeAreaInsets();
   const userLogin = useSelector(state => state.data.accountLogin);
@@ -105,6 +106,12 @@ const CreatePost = () => {
   useEffect(() => {
     setImgPost(picture);
   }, [picture]);
+
+  useEffect(() => {
+    if (upImage) {
+      uploadImage();
+    }
+  }, []);
 
   const uploadImage = () => {
     let options = {
