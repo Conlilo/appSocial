@@ -1,4 +1,5 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
+import axios from 'axios';
 import React, { Fragment, useEffect, useState } from 'react';
 import {
   ScrollView,
@@ -16,6 +17,7 @@ import { launchImageLibrary } from 'react-native-image-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
 import ImagePost from '../components/imagePost';
+import { fetchImageApi, uploadImageUrl } from '../constants';
 import { Icon } from '../core/icon';
 import { dataActions } from '../redux/slices/dataApi';
 
@@ -23,7 +25,7 @@ const CreatePost = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const postEdit = useSelector(
-    state => state.data.store.filter(x => x.id === route?.params)[0],
+    state => state.data.realStore.filter(x => x.id === route?.params)[0],
   );
   const upImage = route?.params?.upImage;
   const dispatch = useDispatch();
@@ -33,12 +35,16 @@ const CreatePost = () => {
   const [imgPost, setImgPost] = useState([]);
   const picture = useSelector(state => state.data.imageCreate);
   const [keyboardHeight, setKeyboardHeight] = useState(safeAreaInsets.bottom);
+  const imageCreate = useSelector(state => state.data.uploadImage);
+  const [listMediaBase64, setListMediaBase64] = useState<any[]>([]);
 
   if (postEdit) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
-      postEdit.imagePost.map(x => dispatch(dataActions.addImageCreate(x)));
-      setTitlePost(postEdit.titlePost);
+      postEdit.images === null || postEdit.images === ''
+        ? dispatch(dataActions.EditImageCreate(Array(0)))
+        : dispatch(dataActions.EditImageCreate(postEdit.images.split(',')));
+      setTitlePost(postEdit.content);
     }, []);
   }
 
@@ -52,24 +58,30 @@ const CreatePost = () => {
     });
   }, []);
 
+  const handleSubmit = async () => {
+    console.log('listMediaBase64', imageCreate);
+
+    // const uploadImage = await axios({
+    //   method: 'post',
+    //   url: uploadImageUrl,
+    //   data: imageCreate,
+    // });
+
+    // console.log(uploadImage);
+
+    postEdit
+      ? dispatch(dataActions.editPost({ titlePost, idPost: postEdit.id }))
+      : dispatch(dataActions.addPost({ titlePost, userLogin: userLogin.id }));
+    navigation.navigate('Home');
+    setImgPost([]);
+    setTitlePost('');
+    dispatch(dataActions.clearData());
+  };
+
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity
-          style={styles.btnPost}
-          onPress={() => {
-            postEdit
-              ? dispatch(
-                  dataActions.editPost({ titlePost, idPost: postEdit.id }),
-                )
-              : dispatch(
-                  dataActions.addPost({ titlePost, userLogin: userLogin.id }),
-                );
-            navigation.navigate('Home');
-            setImgPost([]);
-            setTitlePost('');
-            dispatch(dataActions.clearData());
-          }}>
+        <TouchableOpacity style={styles.btnPost} onPress={handleSubmit}>
           <Text style={styles.colorWhite}>
             {postEdit ? 'Cập nhật' : 'Đăng'}
           </Text>
@@ -120,6 +132,7 @@ const CreatePost = () => {
         skipBackup: true,
         path: 'images',
       },
+      includeBase64: true,
     };
     launchImageLibrary(options, response => {
       if (response.didCancel) {
@@ -128,6 +141,14 @@ const CreatePost = () => {
         console.log('image picker error', response.errorMessage);
       } else {
         dispatch(dataActions.addImageCreate(response.assets[0].uri));
+
+        const { base64 } = response.assets[0];
+        dispatch(
+          dataActions.uploadImage({
+            name: `${response.assets[0].fileName}`,
+            content: base64,
+          }),
+        );
       }
     });
   };
@@ -136,7 +157,10 @@ const CreatePost = () => {
     <Fragment>
       <ScrollView>
         <View style={styles.c147}>
-          <Image source={{ uri: userLogin.avatar }} style={styles.avaUser} />
+          <Image
+            source={{ uri: fetchImageApi(userLogin.avatar) }}
+            style={styles.avaUser}
+          />
           <Text style={styles.marginTop}>{userLogin.name}</Text>
         </View>
         <View style={styles.backgroundWhite}>
@@ -151,7 +175,7 @@ const CreatePost = () => {
             onPress={() => {
               navigation.navigate('CreateImagePost');
             }}>
-            <ImagePost imagesPost={imgPost} disable={true} />
+            <ImagePost imagesPost={imgPost} disable={true} newPost={true} />
           </TouchableOpacity>
         </View>
       </ScrollView>

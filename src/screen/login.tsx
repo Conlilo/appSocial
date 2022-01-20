@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppImage } from '../core/image';
 import { dataActions } from '../redux/slices/dataApi';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -95,6 +96,7 @@ const Login = () => {
             })
               .then(function (response) {
                 //handle success
+                AsyncStorage.setItem('token', response.data.access_token);
                 dispatch(
                   dataActions.Token({ response: response.data.access_token }),
                 );

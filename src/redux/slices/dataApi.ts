@@ -221,17 +221,30 @@ const initialState = {
       avatar: 'https://i.pravatar.cc/30?img=6',
     },
   ],
+  currentPost: {},
   store: [],
   realStore: [],
+  product: [],
   idKeyPost: 100,
-  idKeyComment: 100,
-  idUserRep: 0,
-  idCommentRep: 0,
+  idKeyComment: 1000,
+  idUserRep: '',
+  idParent: null,
   isLogin: false,
   accountLogin: {},
   imageCreate: [],
+  uploadImage: [],
   token: '',
   avatar: '',
+  limit: 10,
+  commentByIdFeed: [],
+};
+
+const loadMore = state => {
+  state.limit += 10;
+};
+
+const defaultLimit = state => {
+  state.limit = 10;
 };
 
 const addPost = (state, action) => {
@@ -267,6 +280,14 @@ const addImageCreate = (state, action) => {
   state.imageCreate.push(action.payload);
 };
 
+const uploadImage = (state, action) => {
+  state.uploadImage.push(action.payload);
+};
+
+const EditImageCreate = (state, action) => {
+  state.imageCreate = action.payload;
+};
+
 const delImageCreate = (state, action) => {
   state.imageCreate = state.imageCreate.filter(x => x !== action.payload);
 };
@@ -281,30 +302,33 @@ const Token = (state, action) => {
 };
 
 const Logout = state => {
-  state.isLogin = false;
+  state.token = '';
 };
 
 const focusReplyUser = (state, action) => {
-  state.idCommentRep = action.payload.idFocusRep;
+  state.idParent = action.payload.idParent;
   state.idUserRep = action.payload.idUserComment;
 };
 
 const defocusReplyUser = state => {
-  state.idCommentRep = 0;
-  state.idUserRep = 0;
+  state.idParent = null;
+  state.idUserRep = '';
 };
 
 const addCommentPost = (state, action) => {
-  state.store
+  state.realStore
     .filter(x => x.id === action.payload.idPost)[0]
     .commentDetail.push({
-      idComment: state.idKeyPost,
-      idUserComment: action.payload.idUser,
-      titleComment: action.payload.comment,
-      timeComment: 'Vừa xong',
-      repComment: [],
+      id: 999999,
+      idParent: null,
+      content: action.payload.content,
+      user: {
+        userId: state.accountLogin.userId,
+        avatar: state.accountLogin.avatar,
+        name: state.accountLogin.name,
+      },
+      createdDate: '2022-01-04T16:44:20.623Z',
     });
-  state.idKeyPost += 1;
 };
 
 const addReplyComment = (state, action) => {
@@ -312,9 +336,15 @@ const addReplyComment = (state, action) => {
     .filter(x => x.id === action.payload.idPost)[0]
     .commentDetail.filter(x => x.idComment === action.payload.idCommentRep)[0]
     .repComment.push({
-      idUserRepComment: action.payload.idUser,
-      titleRepComment: action.payload.comment,
-      timeRepComment: 'Vừa xong',
+      id: 999999,
+      idParent: state.idParent,
+      content: action.payload.content,
+      user: {
+        userId: state.accountLogin.userId,
+        avatar: state.accountLogin.avatar,
+        name: state.accountLogin.name,
+      },
+      createdDate: '2022-01-04T16:44:20.623Z',
     });
   state.idUserRep = 0;
   state.idCommentRep = 0;
@@ -325,16 +355,8 @@ const publicStore = state => {
 };
 
 const likedPost = (state, action) => {
-  state.store
-    .filter(x => x.id === action.payload.idPost)[0]
-    .numLike.push(state.accountLogin.id);
-};
-
-const dislikedPost = (state, action) => {
-  state.store.filter(x => x.id === action.payload.idPost)[0].numLike =
-    state.store
-      .filter(x => x.id === action.payload.idPost)[0]
-      .numLike.filter(x => x !== state.accountLogin.id);
+  state.realStore.filter(x => x.id === action.payload.idPost)[0].isLiked =
+    !state.realStore.filter(x => x.id === action.payload.idPost)[0].isLiked;
 };
 
 const testAction = () => {};
@@ -347,13 +369,24 @@ const addRealStore = (state, action) => {
   state.realStore = action.payload.data;
 };
 
+const addProduct = (state, action) => {
+  state.product = action.payload.product;
+};
+
+const addCurrentPost = (state, action) => {
+  state.currentPost = action.payload.currentPost;
+};
+
+const addCommentByFeedId = (state, action) => {
+  state.commentByIdFeed = action.payload.commentByIdFeed;
+};
+
 const dataSlice = createSlice({
   name: 'data',
   initialState,
   reducers: {
     publicStore,
     likedPost,
-    dislikedPost,
     addCommentPost,
     defocusReplyUser,
     focusReplyUser,
@@ -370,6 +403,13 @@ const dataSlice = createSlice({
     Token,
     Avatar,
     addRealStore,
+    loadMore,
+    defaultLimit,
+    addProduct,
+    addCurrentPost,
+    addCommentByFeedId,
+    EditImageCreate,
+    uploadImage,
   },
 });
 

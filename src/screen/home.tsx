@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { Fragment } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import {
   View,
   Image,
@@ -11,46 +11,95 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
 import Space from '../components/space';
+import { fetchImageApi } from '../constants';
 import { Icon } from '../core/icon';
 import { dataActions } from '../redux/slices/dataApi';
+import getPost from '../services/post';
+import getProduct from '../services/product';
+import getCurrentUser from '../services/user';
 import PostSocial from './postSocial';
 
 const Home = () => {
   const navigation = useNavigation();
   const safeAreaInsets = useSafeAreaInsets();
-  const data = useSelector(state => state.data.store);
-  const user = useSelector(state => state.data.dataUser);
-  const userLogin = useSelector(state => state.data.accountLogin);
   const dispatch = useDispatch();
+  const userToken = useSelector(state => state.data.token);
+  const realData = useSelector(state => state.data.realStore);
+  const avatar = useSelector(state => state.data.avatar);
+  const limit = useSelector(state => state.data.limit);
+
+  const _getCurrentUser = async () => {
+    try {
+      const result = await getCurrentUser();
+      dispatch(dataActions.Avatar({ result: result.data.data.avatar }));
+    } catch (error) {
+      // error.message
+      dispatch(dataActions.Logout());
+    }
+  };
+
+  const _getPost = async () => {
+    try {
+      // const result = await getPost(offsetPost, limitPost);
+      const result = await getPost(limit);
+      dispatch(dataActions.addRealStore({ data: result?.data?.data }));
+    } catch (error) {
+      dispatch(dataActions.Logout());
+    }
+  };
+
+  const _getProduct = async () => {
+    try {
+      const result = await getProduct();
+      dispatch(dataActions.addProduct({ product: result?.data.data }));
+    } catch (error) {
+      dispatch(dataActions.Logout());
+    }
+  };
+
+  useEffect(() => {
+    _getPost();
+  }, [limit]);
+
+  useEffect(() => {
+    _getCurrentUser();
+    _getPost();
+    _getProduct();
+  }, [userToken]);
 
   return (
     <View style={[styles.backgroundColor, { paddingTop: safeAreaInsets.top }]}>
       {/* Bài viết */}
       <FlatList
-        data={[...data].reverse()}
+        data={realData}
+        refreshing={false}
+        onRefresh={() => {
+          dispatch(dataActions.defaultLimit());
+        }}
         renderItem={({ item }) => {
           return (
             <PostSocial
-              idAccountPost={item.idUser}
-              titlePost={item.titlePost}
-              accountPost={user.filter(x => x.id === item.idUser)[0].name}
-              timePost={item.timePost}
-              avaPost={user.filter(x => x.id === item.idUser)[0].avatar}
-              image={item.imagePost}
-              numCommentPost={item.commentDetail.length}
-              numLikePost={item.numLike.length}
-              active={
-                item.numLike.filter(x => x === userLogin.id)[0] === userLogin.id
-              }
+              idAccountPost={item.userId}
+              titlePost={item.content}
+              accountPost={item.user.name}
+              timePost={item.createDate}
+              avaPost={fetchImageApi(item.user.avatar)}
+              image={[...(item?.images?.split(',') || [])]}
+              numCommentPost={item.comment}
+              numLikePost={item.like}
               idPost={item.id}
+              product={item.product ? item.product : Object}
             />
           );
+        }}
+        onEndReached={() => {
+          dispatch(dataActions.loadMore());
         }}
         ListHeaderComponent={
           <Fragment>
             <View style={styles.c147}>
               <Image
-                source={{ uri: userLogin.avatar }}
+                source={{ uri: fetchImageApi(avatar) }}
                 style={styles.avaUser}
               />
               <TouchableOpacity

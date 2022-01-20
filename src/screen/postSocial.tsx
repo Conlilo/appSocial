@@ -1,20 +1,18 @@
 //import { useNavigation } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
+import { act } from 'react-test-renderer';
 import BtnLike from '../components/btnLike';
 import ImagePost from '../components/imagePost';
 import Line from '../components/line';
 import PostForm from '../components/postForm';
 import PostStatus from '../components/postStatus';
 import Space from '../components/space';
-import { fetchImageApi } from '../constants';
 import { Icon } from '../core/icon';
 import { dataActions } from '../redux/slices/dataApi';
-import getPost from '../services/post';
-import getCurrentUser from '../services/user';
-
+import getCurrentPost from '../services/curentPost';
 const PostSocial = ({
   titlePost,
   accountPost,
@@ -23,9 +21,9 @@ const PostSocial = ({
   image,
   numCommentPost,
   numLikePost,
-  active,
   idPost,
   idAccountPost,
+  product,
 }: {
   titlePost: string;
   accountPost: string;
@@ -34,39 +32,30 @@ const PostSocial = ({
   numCommentPost: number;
   numLikePost: number;
   avaPost: string;
-  active: boolean;
   idPost: number;
   idAccountPost: number;
+  product: Object;
 }) => {
   const navigation = useNavigation();
-  // const dispatch = useDispatch();
-  // const userToken = useSelector(state => state.data.token);
-  // const realData = useSelector(state => state.data.realStore);
+  const active = useSelector(
+    state => state.data.realStore.filter(x => x.id === idPost)[0].isLiked,
+  );
+  const userToken = useSelector(state => state.data.token);
+  const dispatch = useDispatch();
 
-  // const _getCurrentUser = async () => {
-  //   try {
-  //     const result = await getCurrentUser();
-  //     dispatch(dataActions.Avatar({ result: result.data.data.avatar }));
-  //   } catch (error) {
-  //     // error.message
-  //     dispatch(dataActions.Logout());
-  //   }
-  // };
+  const _getCurrenPost = async () => {
+    try {
+      // const result = await getPost(offsetPost, limitPost);
+      const result = await getCurrentPost(idPost);
+      dispatch(dataActions.addCurrentPost({ currentPost: result?.data.data }));
+    } catch (error) {
+      dispatch(dataActions.Logout());
+    }
+  };
 
-  // const _getPost = async () => {
-  //   try {
-  //     const result = await getPost();
-  //     dispatch(dataActions.addRealStore({ data: result?.data.data }));
-  //   } catch (error) {
-  //     dispatch(dataActions.Logout());
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   _getCurrentUser();
-  //   _getPost();
-  // }, [userToken]);
-
+  useEffect(() => {
+    _getCurrenPost();
+  }, [userToken]);
   return (
     <View style={styles.stylePost}>
       <PostForm
@@ -78,10 +67,57 @@ const PostSocial = ({
         active={active}
         idAccountPost={idAccountPost}
       />
-      {/* eslint-disable-next-line react-native/no-inline-styles*/}
-      <View style={{ flex: 1 }}>
-        <ImagePost imagesPost={image} disable={false} />
+
+      {image.filter(x => x).length ? (
+        /* eslint-disable-next-line react-native/no-inline-styles*/
+        <View style={{ flex: 1 }}>
+          <ImagePost imagesPost={image} disable={false} />
+        </View>
+      ) : (
+        <></>
+      )}
+
+      {/* Bắt đầu phần sản phẩm */}
+      {/* eslint-disable-next-line react-native/no-inline-styles */}
+      <View style={{ margin: 5 }}>
+        {product !== Object ? (
+          <>
+            <ImagePost
+              imagesPost={
+                product.listImages
+                  ? [product.image].concat(product.listImages.split(','))
+                  : [product.image]
+              }
+            />
+
+            <View style={styles.viewProduct}>
+              <View style={styles.flexColumn}>
+                <Text style={styles.captialize}>{product.name}</Text>
+                <Text>
+                  Giá bán:{' '}
+                  <Text style={styles.color}>
+                    {product.price
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                  </Text>
+                </Text>
+              </View>
+              <TouchableOpacity style={styles.postSale}>
+                <Image source={Icon.Pencil} />
+                <Text style={styles.color}>Đăng bán</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.bonusBorder}>
+              <Text style={styles.bounus}>
+                Hoa hồng: {product.level0} - {product.level5}%
+              </Text>
+            </View>
+          </>
+        ) : (
+          <></>
+        )}
       </View>
+      {/* Kết thúc phần sản phẩm */}
       <PostStatus
         active={active}
         numCommentPost={numCommentPost}
@@ -94,7 +130,12 @@ const PostSocial = ({
         <TouchableOpacity
           style={styles.flexRow}
           onPress={() =>
-            navigation.navigate('PostComment', { idPost, active })
+            navigation.navigate('PostComment', {
+              idPost,
+              active,
+              avaPost,
+              accountPost,
+            })
           }>
           <Image source={Icon.Comment} style={styles.marginRight} />
           <Text style={styles.alignCenter}>Bình luận</Text>
@@ -130,7 +171,34 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   stylePost: {
-    marginVertical: 8,
     backgroundColor: 'white',
   },
+  bounus: {
+    color: 'white',
+    margin: 5,
+    fontSize: 12,
+  },
+  bonusBorder: {
+    width: 130,
+    borderRadius: 9,
+    backgroundColor: 'red',
+    alignItems: 'center',
+  },
+  viewProduct: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: 5,
+  },
+  color: { color: '#24FF00' },
+  postSale: {
+    flexDirection: 'row',
+    borderWidth: 2,
+    borderRadius: 5,
+    paddingHorizontal: 15,
+    alignItems: 'center',
+    borderColor: '#24FF00',
+  },
+  captialize: { textTransform: 'capitalize' },
+  colorGreen: { color: 'green' },
+  flexColumn: { flexDirection: 'column' },
 });

@@ -1,19 +1,36 @@
+import axios from 'axios';
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Icon } from '../core/icon';
 
 import { dataActions } from '../redux/slices/dataApi';
 
 const BtnLike = ({ active, idPost }: { active: boolean; idPost: number }) => {
   const dispatch = useDispatch();
+  const userToken = useSelector(state => state.data.token);
   return (
     <TouchableOpacity
       style={styles.flexRow}
-      onPress={() => {
-        active
-          ? dispatch(dataActions.dislikedPost({ idPost }))
-          : dispatch(dataActions.likedPost({ idPost }));
+      onPress={async () => {
+        dispatch(dataActions.likedPost({ idPost }));
+        await axios({
+          method: 'post',
+          // eslint-disable-next-line quotes
+          url: `https://devapi.cuccu.vn/cuccu.api/Likes`,
+          data: { idFeed: idPost },
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        })
+          .then(function (response) {
+            //handle success
+            console.log(response.data.data.idFeedNavigation.like);
+          })
+          .catch(function (error) {
+            //handle error
+            console.log('error', error);
+          });
       }}>
       <Image
         source={Icon.Heart}

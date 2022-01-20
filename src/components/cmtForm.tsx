@@ -8,107 +8,123 @@ import {
   View,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
+import { fetchImageApi } from '../constants';
+import { AppImage } from '../core/image';
 import { dataActions } from '../redux/slices/dataApi';
+import moment from 'moment';
 
 const CmtForm = ({
   idComment,
-  idUserComment,
+  name,
+  avatar,
   titleComment,
   timeComment,
   repComment,
+  isParent,
 }: {
   idComment: number;
-  idUserComment: number;
+  name: string;
+  avatar: string;
   titleComment: string;
   timeComment: string;
-  repComment: Array<object>;
+  repComment: Array<Object>;
+  isParent: number;
 }) => {
-  const user = useSelector(state => state.data.dataUser);
   const dispatch = useDispatch();
   return (
-    <View style={styles.mv10}>
-      <View style={styles.flexRow}>
-        <Image
-          source={{ uri: user.filter(x => x.id === idUserComment)[0].avatar }}
-          style={styles.avaPost123}
-        />
-        <View>
-          <View style={styles.commentBox}>
-            <Text style={styles.fontBold}>
-              {user.filter(x => x.id === idUserComment)[0].name}
-            </Text>
-            <Text>{titleComment}</Text>
-          </View>
+    <>
+      {isParent ? (
+        <View />
+      ) : (
+        <View style={styles.mv10}>
           <View style={styles.flexRow}>
-            <Text style={styles.color9c9c9c}>{timeComment}</Text>
-            <TouchableOpacity
-              onPress={() => {
-                dispatch(
-                  dataActions.focusReplyUser({
-                    idFocusRep: idComment,
-                    idUserComment,
-                  }),
-                );
-              }}>
-              <Text style={styles.color9c9c9c}>Trả lời</Text>
-            </TouchableOpacity>
+            {/*  eslint-disable-next-line react-native/no-inline-styles */}
+            <View style={{ position: 'absolute' }}>
+              <Image source={AppImage.NoneAvatar} style={styles.avaPost123} />
+            </View>
+            <Image source={{ uri: avatar }} style={styles.avaPost123} />
+            <View>
+              <View style={styles.commentBox}>
+                <Text style={styles.fontBold}>{name}</Text>
+                <Text>{titleComment}</Text>
+              </View>
+              <View style={styles.flexRow}>
+                <Text style={styles.color9c9c9c}>
+                  {moment(timeComment).subtract(7, 'hours').fromNow()}
+                </Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    dispatch(
+                      dataActions.focusReplyUser({
+                        idUserComment: name,
+                        idParent: idComment,
+                      }),
+                    );
+                  }}>
+                  <Text style={styles.color9c9c9c}>Trả lời</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
-        </View>
-      </View>
-      {/* replied comment */}
-      {repComment.length > 0 ? (
-        <FlatList
-          data={repComment}
-          renderItem={item => {
-            return (
-              <View style={styles.ml40}>
-                <View style={styles.flexRow}>
-                  <Image
-                    source={{
-                      uri: user.filter(
-                        x => x.id === item.item.idUserRepComment,
-                      )[0].avatar,
-                    }}
-                    style={styles.avaPost123}
-                  />
-                  <View>
-                    <View style={styles.commentBox}>
-                      <Text style={styles.fontBold}>
-                        {
-                          [...user].filter(
-                            x => x.id === item.item.idUserRepComment,
-                          )[0].name
-                        }
-                      </Text>
-                      <Text>{item.item.titleRepComment}</Text>
-                    </View>
+          {/* replied comment */}
+          {repComment.length > 0 ? (
+            <FlatList
+              data={repComment}
+              renderItem={item => {
+                return (
+                  <View style={styles.ml40}>
                     <View style={styles.flexRow}>
-                      <Text style={styles.color9c9c9c}>
-                        {item.item.timeRepComment}
-                      </Text>
-                      <TouchableOpacity
-                        onPress={() => {
-                          dispatch(
-                            dataActions.focusReplyUser({
-                              idFocusRep: idComment,
-                              idUserComment,
-                            }),
-                          );
-                        }}>
-                        <Text style={styles.color9c9c9c}>Trả lời</Text>
-                      </TouchableOpacity>
+                      {/* eslint-disable-next-line react-native/no-inline-styles */}
+                      <View style={{ position: 'absolute' }}>
+                        <Image
+                          source={AppImage.NoneAvatar}
+                          style={styles.avaPost123}
+                        />
+                      </View>
+                      <Image
+                        source={{
+                          uri: fetchImageApi(item.item.user.avatar),
+                        }}
+                        style={styles.avaPost123}
+                      />
+                      <View>
+                        <View style={styles.commentBox}>
+                          <Text style={styles.fontBold}>
+                            {item.item.user.name}
+                          </Text>
+                          <Text>{item.item.content}</Text>
+                        </View>
+                        <View style={styles.flexRow}>
+                          <Text style={styles.color9c9c9c}>
+                            {moment(item.item.createdDate)
+                              .subtract(7, 'hours')
+                              .fromNow()}
+                          </Text>
+                          <TouchableOpacity
+                            onPress={() => {
+                              dispatch(
+                                dataActions.focusReplyUser({
+                                  idUserComment: item.item.user.name,
+                                  idParent: idComment,
+                                }),
+                              );
+                            }}>
+                            <Text style={styles.color9c9c9c}>Trả lời</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
                     </View>
                   </View>
-                </View>
-              </View>
-            );
-          }}
-        />
-      ) : (
-        <View />
+                );
+              }}
+            />
+          ) : (
+            <View />
+          )}
+          {/* end replied comment */}
+        </View>
       )}
-      {/* end replied comment */}
-    </View>
+    </>
   );
 };
 

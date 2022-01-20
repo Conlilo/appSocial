@@ -8,21 +8,32 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { fetchImageApi, fetchVideoApi } from '../constants';
 
 interface ImagePost {
   imagesPost: Array<string>;
   disable: boolean;
+  newPost?: boolean;
 }
 
-const ImagePost = ({ imagesPost, disable }: ImagePost) => {
+const ImagePost = ({ imagesPost, disable, newPost = false }: ImagePost) => {
   const [visible, setVisible] = useState(false);
   const [indexState, setIndexState] = useState(0);
 
   const imgView = (index: number) => {
     setVisible(true);
     setIndexState(index);
-    console.log(imagesPost.map(x => ({ uri: x })));
-    console.log(index);
+  };
+
+  const isVideo = (item: string) => {
+    if (item.search('video_') !== -1) {
+      return fetchVideoApi(item.slice(-item.length + 6));
+    } else {
+      if (newPost) {
+        return item;
+      }
+      return fetchImageApi(item);
+    }
   };
 
   if (imagesPost.length === 0) {
@@ -37,7 +48,9 @@ const ImagePost = ({ imagesPost, disable }: ImagePost) => {
           style={styles.flex1}
           disabled={disable}>
           <Image
-            source={{ uri: imagesPost[0] }}
+            source={{
+              uri: isVideo(imagesPost[0]),
+            }}
             style={[
               // eslint-disable-next-line react-native/no-inline-styles
               {
@@ -65,7 +78,7 @@ const ImagePost = ({ imagesPost, disable }: ImagePost) => {
           style={styles.flex1}
           disabled={disable}>
           <Image
-            source={{ uri: imagesPost[0] }}
+            source={{ uri: isVideo(imagesPost[0]) }}
             style={[
               // eslint-disable-next-line react-native/no-inline-styles
               {
@@ -80,7 +93,7 @@ const ImagePost = ({ imagesPost, disable }: ImagePost) => {
           style={styles.flex1}
           disabled={disable}>
           <Image
-            source={{ uri: imagesPost[1] }}
+            source={{ uri: isVideo(imagesPost[1]) }}
             style={[
               // eslint-disable-next-line react-native/no-inline-styles
               {
@@ -91,7 +104,7 @@ const ImagePost = ({ imagesPost, disable }: ImagePost) => {
           />
         </TouchableOpacity>
         <ImageView
-          images={imagesPost.map(x => ({ uri: x }))}
+          images={imagesPost.map(x => ({ uri: isVideo(x) }))}
           imageIndex={indexState}
           visible={visible}
           onRequestClose={() => setVisible(false)}
@@ -107,7 +120,7 @@ const ImagePost = ({ imagesPost, disable }: ImagePost) => {
           style={styles.flex1}
           disabled={disable}>
           <Image
-            source={{ uri: imagesPost[0] }}
+            source={{ uri: isVideo(imagesPost[0]) }}
             style={[
               {
                 width: Dimensions.get('window').width,
@@ -122,7 +135,7 @@ const ImagePost = ({ imagesPost, disable }: ImagePost) => {
             style={styles.flex1}
             disabled={disable}>
             <Image
-              source={{ uri: imagesPost[1] }}
+              source={{ uri: isVideo(imagesPost[1]) }}
               style={[
                 // eslint-disable-next-line react-native/no-inline-styles
                 {
@@ -166,7 +179,7 @@ const ImagePost = ({ imagesPost, disable }: ImagePost) => {
               style={styles.flex1}
               disabled={disable}>
               <Image
-                source={{ uri: imagesPost[2] }}
+                source={{ uri: isVideo(imagesPost[2]) }}
                 style={[
                   // eslint-disable-next-line react-native/no-inline-styles
                   {
@@ -179,7 +192,7 @@ const ImagePost = ({ imagesPost, disable }: ImagePost) => {
           </View>
         </View>
         <ImageView
-          images={imagesPost.map(x => ({ uri: x }))}
+          images={imagesPost.map(x => ({ uri: isVideo(x) }))}
           imageIndex={indexState}
           visible={visible}
           onRequestClose={() => setVisible(false)}
@@ -187,6 +200,8 @@ const ImagePost = ({ imagesPost, disable }: ImagePost) => {
       </View>
     );
   }
+
+  return <></>;
 };
 
 const styles = StyleSheet.create({

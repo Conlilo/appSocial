@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Image,
   Text,
@@ -14,6 +14,9 @@ import { Icon } from '../core/icon';
 import Modal from 'react-native-modal';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { dataActions } from '../redux/slices/dataApi';
+import AttributedText from '@ahiho/react-native-attributed-text';
+import { AppImage } from '../core/image';
+import getCurrentUser from '../services/user';
 
 const PostForm = ({
   titlePost,
@@ -36,7 +39,22 @@ const PostForm = ({
   const [modalVisible, setModalVisible] = useState(false);
   const navigation = useNavigation();
   const safeAreaInsets = useSafeAreaInsets();
+  const userToken = useSelector(state => state.data.token);
   const dispatch = useDispatch();
+
+  const _getCurrentUser = async () => {
+    try {
+      const result = await getCurrentUser();
+      dispatch(dataActions.Login({ userDispatch: result.data.data }));
+    } catch (error) {
+      // error.message
+      dispatch(dataActions.Logout());
+    }
+  };
+
+  useEffect(() => {
+    _getCurrentUser();
+  }, [userToken]);
 
   return (
     <>
@@ -47,18 +65,42 @@ const PostForm = ({
           backgroundColor: 'white',
         }}
         onPress={() => {
-          navigation.navigate('PostComment', { idPost, active });
+          navigation.navigate('PostComment', {
+            idPost,
+            active,
+            avaPost,
+            accountPost,
+          });
         }}>
         <View style={styles.flexRow}>
+          <View style={{ position: 'absolute' }}>
+            <Image source={AppImage.NoneAvatar} style={styles.avaPost} />
+          </View>
           <Image source={{ uri: avaPost }} style={styles.avaPost} />
           <View style={styles.marginTop}>
             <Text style={styles.fontBold}>{accountPost}</Text>
             <Text style={styles.color9c9c9c}>{timePost}</Text>
           </View>
         </View>
-        <Text style={styles.titlePost}>{titlePost}</Text>
+        {titlePost === '' || titlePost === null ? (
+          <View />
+        ) : (
+          <AttributedText
+            annotationProps={{
+              link: {
+                style: {
+                  color: 'blue',
+                  textDecorationLine: 'underline',
+                },
+                onPress: () => {},
+              },
+            }}
+            style={styles.titlePost}>
+            {titlePost}
+          </AttributedText>
+        )}
       </TouchableOpacity>
-      {idAccountPost === userLogin.id ? (
+      {idAccountPost === userLogin.userId ? (
         <TouchableOpacity
           style={styles.btnOption}
           onPress={() => {
