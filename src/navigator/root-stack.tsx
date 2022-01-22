@@ -23,7 +23,7 @@ const RootStack = () => {
       <Stack.Screen
         name="CreatePost"
         component={CreatePost}
-        options={{ title: 'Tạo bài viêt' }}
+        options={{ title: 'Tạo bài viêt', headerShown: false }}
       />
       <Stack.Screen
         name="CreateImagePost"

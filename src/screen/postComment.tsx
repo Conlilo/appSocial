@@ -325,6 +325,7 @@ const PostComment = () => {
                   console.log('error', error);
                 });
               setComment('');
+              _getCommentByFeedId();
             }
           }}>
           <Image source={Icon.Send} style={styles.iconSend} />

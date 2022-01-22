@@ -1,9 +1,8 @@
 //import { useNavigation } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { act } from 'react-test-renderer';
 import BtnLike from '../components/btnLike';
 import ImagePost from '../components/imagePost';
 import Line from '../components/line';
@@ -85,7 +84,9 @@ const PostSocial = ({
             <ImagePost
               imagesPost={
                 product.listImages
-                  ? [product.image].concat(product.listImages.split(','))
+                  ? [product.image, ...product.listImages.split(',')].filter(
+                      x => x,
+                    )
                   : [product.image]
               }
             />

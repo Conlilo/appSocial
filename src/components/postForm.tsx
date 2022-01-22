@@ -17,6 +17,8 @@ import { dataActions } from '../redux/slices/dataApi';
 import AttributedText from '@ahiho/react-native-attributed-text';
 import { AppImage } from '../core/image';
 import getCurrentUser from '../services/user';
+import deletePost from '../services/deletePost';
+import getPost from '../services/post';
 
 const PostForm = ({
   titlePost,
@@ -41,6 +43,7 @@ const PostForm = ({
   const safeAreaInsets = useSafeAreaInsets();
   const userToken = useSelector(state => state.data.token);
   const dispatch = useDispatch();
+  const limit = useSelector(state => state.data.limit);
 
   const _getCurrentUser = async () => {
     try {
@@ -150,8 +153,13 @@ const PostForm = ({
                   {
                     text: 'Xóa',
                     style: 'destructive',
-                    onPress: () => {
+                    onPress: async () => {
                       dispatch(dataActions.delPost({ idPost }));
+                      await deletePost(idPost);
+                      const result = await getPost(limit);
+                      dispatch(
+                        dataActions.addRealStore({ data: result?.data?.data }),
+                      );
                     },
                   },
                   {

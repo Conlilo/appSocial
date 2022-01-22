@@ -1,4 +1,5 @@
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
+import moment from 'moment';
 import React, { Fragment, useEffect, useState } from 'react';
 import {
   View,
@@ -15,7 +16,6 @@ import { fetchImageApi } from '../constants';
 import { Icon } from '../core/icon';
 import { dataActions } from '../redux/slices/dataApi';
 import getPost from '../services/post';
-import getProduct from '../services/product';
 import getCurrentUser from '../services/user';
 import PostSocial from './postSocial';
 
@@ -27,6 +27,7 @@ const Home = () => {
   const realData = useSelector(state => state.data.realStore);
   const avatar = useSelector(state => state.data.avatar);
   const limit = useSelector(state => state.data.limit);
+  const isFocus = useIsFocused();
 
   const _getCurrentUser = async () => {
     try {
@@ -48,14 +49,20 @@ const Home = () => {
     }
   };
 
-  const _getProduct = async () => {
-    try {
-      const result = await getProduct();
-      dispatch(dataActions.addProduct({ product: result?.data.data }));
-    } catch (error) {
-      dispatch(dataActions.Logout());
+  // const _getProduct = async () => {
+  //   try {
+  //     const result = await getProduct();
+  //     dispatch(dataActions.addProduct({ product: result?.data.data }));
+  //   } catch (error) {
+  //     dispatch(dataActions.Logout());
+  //   }
+  // };
+
+  useEffect(() => {
+    if (isFocus) {
+      _getPost();
     }
-  };
+  }, [isFocus]);
 
   useEffect(() => {
     _getPost();
@@ -64,7 +71,7 @@ const Home = () => {
   useEffect(() => {
     _getCurrentUser();
     _getPost();
-    _getProduct();
+    // _getProduct();
   }, [userToken]);
 
   return (
@@ -73,8 +80,10 @@ const Home = () => {
       <FlatList
         data={realData}
         refreshing={false}
-        onRefresh={() => {
+        onRefresh={async () => {
           dispatch(dataActions.defaultLimit());
+          const dataPosts = await getPost(10);
+          dispatch(dataActions.addRealStore({ data: dataPosts?.data.data }));
         }}
         renderItem={({ item }) => {
           return (
@@ -82,7 +91,7 @@ const Home = () => {
               idAccountPost={item.userId}
               titlePost={item.content}
               accountPost={item.user.name}
-              timePost={item.createDate}
+              timePost={moment(item.createdDate).subtract(7, 'hours').fromNow()}
               avaPost={fetchImageApi(item.user.avatar)}
               image={[...(item?.images?.split(',') || [])]}
               numCommentPost={item.comment}
@@ -128,13 +137,17 @@ const Home = () => {
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.optionBar}
-                onPress={() => navigation.navigate('CreatePost')}>
+                onPress={() =>
+                  navigation.navigate('CreatePost', { upVideo: true })
+                }>
                 <Image style={styles.iconUpPost} source={Icon.Video} />
                 <Text>Video</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.optionBar}
-                onPress={() => navigation.navigate('CreatePost')}>
+                onPress={() =>
+                  navigation.navigate('CreatePost', { upProduct: true })
+                }>
                 <Image source={Icon.Product} style={styles.iconUpPost} />
                 <Text>Sản phẩm</Text>
               </TouchableOpacity>

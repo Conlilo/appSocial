@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import ImageView from 'react-native-image-viewing';
 import {
   Dimensions,
@@ -9,14 +9,22 @@ import {
   View,
 } from 'react-native';
 import { fetchImageApi, fetchVideoApi } from '../constants';
+import CCYouTube from './CCYouTube';
+import { Icon } from '../core/icon';
 
 interface ImagePost {
   imagesPost: Array<string>;
   disable: boolean;
   newPost?: boolean;
+  updatePost?: boolean;
 }
 
-const ImagePost = ({ imagesPost, disable, newPost = false }: ImagePost) => {
+const ImagePost = ({
+  imagesPost,
+  disable,
+  newPost = false,
+  updatePost = false,
+}: ImagePost) => {
   const [visible, setVisible] = useState(false);
   const [indexState, setIndexState] = useState(0);
 
@@ -25,12 +33,43 @@ const ImagePost = ({ imagesPost, disable, newPost = false }: ImagePost) => {
     setIndexState(index);
   };
 
+  useEffect(() => {}, []);
+
+  const PlayScreen = ({ item, width }: { item: string; width: number }) => {
+    if (isVideo(item).includes('https://img.youtube.com/vi/')) {
+      return (
+        <View
+          // eslint-disable-next-line react-native/no-inline-styles
+          style={{
+            backgroundColor: '#00000080',
+            width,
+            position: 'absolute',
+            zIndex: 123,
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: -10,
+            justifyContent: 'center',
+          }}>
+          <Image source={Icon.Play} style={styles.btnPlay} />
+        </View>
+      );
+    }
+    return <Fragment />;
+  };
+
   const isVideo = (item: string) => {
     if (item.search('video_') !== -1) {
       return fetchVideoApi(item.slice(-item.length + 6));
     } else {
       if (newPost) {
         return item;
+      }
+      if (updatePost) {
+        if (item.includes('file://')) {
+          return item;
+        }
+        return fetchImageApi(item);
       }
       return fetchImageApi(item);
     }
@@ -47,6 +86,10 @@ const ImagePost = ({ imagesPost, disable, newPost = false }: ImagePost) => {
           onPress={() => imgView(0)}
           style={styles.flex1}
           disabled={disable}>
+          <PlayScreen
+            item={isVideo(imagesPost[0])}
+            width={Dimensions.get('window').width}
+          />
           <Image
             source={{
               uri: isVideo(imagesPost[0]),
@@ -61,10 +104,22 @@ const ImagePost = ({ imagesPost, disable, newPost = false }: ImagePost) => {
           />
         </TouchableOpacity>
         <ImageView
-          images={imagesPost.map(x => ({ uri: x }))}
+          images={imagesPost.map(x => ({ uri: isVideo(x) }))}
           imageIndex={indexState}
           visible={visible}
           onRequestClose={() => setVisible(false)}
+          YouTubeComponent={(url: { uri: string }) => {
+            console.log(url);
+            return (
+              <View style={styles.youtubeComponent}>
+                <CCYouTube
+                  videoId={url.uri
+                    .replace('https://img.youtube.com/vi/', '')
+                    .replace('/hqdefault.jpg', '')}
+                />
+              </View>
+            );
+          }}
         />
       </>
     );
@@ -77,6 +132,10 @@ const ImagePost = ({ imagesPost, disable, newPost = false }: ImagePost) => {
           onPress={() => imgView(0)}
           style={styles.flex1}
           disabled={disable}>
+          <PlayScreen
+            item={isVideo(imagesPost[0])}
+            width={Dimensions.get('window').width / 2}
+          />
           <Image
             source={{ uri: isVideo(imagesPost[0]) }}
             style={[
@@ -92,6 +151,10 @@ const ImagePost = ({ imagesPost, disable, newPost = false }: ImagePost) => {
           onPress={() => imgView(1)}
           style={styles.flex1}
           disabled={disable}>
+          <PlayScreen
+            item={isVideo(imagesPost[1])}
+            width={Dimensions.get('window').width / 2}
+          />
           <Image
             source={{ uri: isVideo(imagesPost[1]) }}
             style={[
@@ -108,6 +171,17 @@ const ImagePost = ({ imagesPost, disable, newPost = false }: ImagePost) => {
           imageIndex={indexState}
           visible={visible}
           onRequestClose={() => setVisible(false)}
+          YouTubeComponent={(url: { uri: string }) => {
+            return (
+              <View style={styles.youtubeComponent}>
+                <CCYouTube
+                  videoId={url.uri
+                    .replace('https://img.youtube.com/vi/', '')
+                    .replace('/hqdefault.jpg', '')}
+                />
+              </View>
+            );
+          }}
         />
       </View>
     );
@@ -119,6 +193,10 @@ const ImagePost = ({ imagesPost, disable, newPost = false }: ImagePost) => {
           onPress={() => imgView(0)}
           style={styles.flex1}
           disabled={disable}>
+          <PlayScreen
+            item={isVideo(imagesPost[0])}
+            width={Dimensions.get('window').width}
+          />
           <Image
             source={{ uri: isVideo(imagesPost[0]) }}
             style={[
@@ -134,6 +212,10 @@ const ImagePost = ({ imagesPost, disable, newPost = false }: ImagePost) => {
             onPress={() => imgView(1)}
             style={styles.flex1}
             disabled={disable}>
+            <PlayScreen
+              item={isVideo(imagesPost[1])}
+              width={Dimensions.get('window').width / 2}
+            />
             <Image
               source={{ uri: isVideo(imagesPost[1]) }}
               style={[
@@ -172,7 +254,10 @@ const ImagePost = ({ imagesPost, disable, newPost = false }: ImagePost) => {
                 </Text>
               </View>
             ) : (
-              <Fragment />
+              <PlayScreen
+                item={isVideo(imagesPost[2])}
+                width={Dimensions.get('window').width / 2}
+              />
             )}
             <TouchableOpacity
               onPress={() => imgView(2)}
@@ -196,6 +281,17 @@ const ImagePost = ({ imagesPost, disable, newPost = false }: ImagePost) => {
           imageIndex={indexState}
           visible={visible}
           onRequestClose={() => setVisible(false)}
+          YouTubeComponent={(url: { uri: string }) => {
+            return (
+              <View style={styles.youtubeComponent}>
+                <CCYouTube
+                  videoId={url.uri
+                    .replace('https://img.youtube.com/vi/', '')
+                    .replace('/hqdefault.jpg', '')}
+                />
+              </View>
+            );
+          }}
         />
       </View>
     );
@@ -233,6 +329,8 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     backgroundColor: 'white',
   },
+  youtubeComponent: { justifyContent: 'center', alignItems: 'center' },
+  btnPlay: { height: 50, width: 50, alignSelf: 'center' },
 });
 
 export default ImagePost;

@@ -274,6 +274,7 @@ const delPost = (state, acion) => {
 
 const clearData = state => {
   state.imageCreate = [];
+  state.uploadImage = [];
 };
 
 const addImageCreate = (state, action) => {
@@ -286,6 +287,10 @@ const uploadImage = (state, action) => {
 
 const EditImageCreate = (state, action) => {
   state.imageCreate = action.payload;
+};
+
+const EditVideoCreate = (state, action) => {
+  state.imageCreate.push(action.payload.video);
 };
 
 const delImageCreate = (state, action) => {
@@ -410,6 +415,7 @@ const dataSlice = createSlice({
     addCommentByFeedId,
     EditImageCreate,
     uploadImage,
+    EditVideoCreate,
   },
 });
 

@@ -8,6 +8,7 @@ import {
   View,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
+import { fetchImageApi } from '../constants';
 import { Icon } from '../core/icon';
 import { dataActions } from '../redux/slices/dataApi';
 
@@ -43,7 +44,11 @@ const CreateImagePost = () => {
               <Image source={Icon.Xicon} style={styled.xicon} />
             </TouchableOpacity>
             <Image
-              source={{ uri: item.item }}
+              source={{
+                uri: item.item.includes('file:///')
+                  ? item.item
+                  : fetchImageApi(item.item),
+              }}
               // eslint-disable-next-line react-native/no-inline-styles
               style={{ width: '100%', height: 300 }}
             />
