@@ -1,8 +1,8 @@
 diff --git a/node_modules/react-native-image-viewing/dist/ImageViewing.js b/node_modules/react-native-image-viewing/dist/ImageViewing.js
-index b7cd1c0..be4f3a4 100644
+index b7cd1c0..a221d13 100644
 --- a/node_modules/react-native-image-viewing/dist/ImageViewing.js
 +++ b/node_modules/react-native-image-viewing/dist/ImageViewing.js
-@@ -5,80 +5,112 @@
+@@ -5,80 +5,110 @@
   * LICENSE file in the root directory of this source tree.
   *
   */
@@ -101,8 +101,6 @@ index b7cd1c0..be4f3a4 100644
 +     const [opacity, onRequestCloseEnhanced] = useRequestClose(onRequestClose);
 +     const [currentImageIndex, onScroll] = useImageIndexChange(imageIndex, SCREEN);
 +     const [headerTransform, footerTransform, toggleBarsVisible,] = useAnimatedComponents();
-+ 
-+     console.log('images', images)
 +     
 +     useEffect(() => {
 +         if (onImageIndexChange) {

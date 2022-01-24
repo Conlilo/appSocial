@@ -109,7 +109,6 @@ const ImagePost = ({
           visible={visible}
           onRequestClose={() => setVisible(false)}
           YouTubeComponent={(url: { uri: string }) => {
-            console.log(url);
             return (
               <View style={styles.youtubeComponent}>
                 <CCYouTube

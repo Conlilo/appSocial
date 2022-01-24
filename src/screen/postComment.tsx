@@ -1,5 +1,6 @@
 import { useRoute } from '@react-navigation/native';
 import axios from 'axios';
+import moment from 'moment';
 import React, { Fragment, useEffect, useState } from 'react';
 import {
   FlatList,
@@ -48,8 +49,6 @@ const PostComment = () => {
 
   const [keyboardHeight, setKeyboardHeight] = useState(safeAreaInsets.bottom);
 
-  console.log(commentByIdFeed.length);
-
   const currentPostDetail = realStore.filter(x => x.id === idPost)[0];
 
   const _getPost = async () => {
@@ -83,7 +82,6 @@ const PostComment = () => {
         );
         return { ..._comment, replies };
       });
-      console.log(result);
       dispatch(
         dataActions.addCommentByFeedId({
           commentByIdFeed: result,
@@ -132,7 +130,9 @@ const PostComment = () => {
             <PostForm
               titlePost={currentPost.content}
               accountPost={accountPost}
-              timePost={currentPost.createdDate}
+              timePost={moment(currentPost.createdDate)
+                .subtract(7, 'hours')
+                .fromNow()}
               avaPost={avaPost}
               active={active}
               idPost={idPost}
@@ -242,7 +242,6 @@ const PostComment = () => {
             {/* eslint-disable-next-line react-native/no-inline-styles*/}
             <Text style={{ color: '#868686' }}>
               Bạn đang trả lời {idFocusRep}
-              {console.log()}
             </Text>
             <TouchableOpacity
               onPress={() => dispatch(dataActions.defocusReplyUser())}>

@@ -11,6 +11,8 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
+import Column from '../components/column';
+import Line from '../components/line';
 import Space from '../components/space';
 import { fetchImageApi } from '../constants';
 import { Icon } from '../core/icon';
@@ -125,7 +127,7 @@ const Home = () => {
                 <Text style={{ color: 'white' }}>Đăng xuất</Text>
               </TouchableOpacity>
             </View>
-
+            <Line />
             <View style={styles.c147}>
               <TouchableOpacity
                 style={styles.optionBar}
@@ -135,6 +137,7 @@ const Home = () => {
                 <Image source={Icon.Image} style={styles.iconUpPost} />
                 <Text>Ảnh</Text>
               </TouchableOpacity>
+              <Column />
               <TouchableOpacity
                 style={styles.optionBar}
                 onPress={() =>
@@ -143,6 +146,7 @@ const Home = () => {
                 <Image style={styles.iconUpPost} source={Icon.Video} />
                 <Text>Video</Text>
               </TouchableOpacity>
+              <Column />
               <TouchableOpacity
                 style={styles.optionBar}
                 onPress={() =>
@@ -161,12 +165,14 @@ const Home = () => {
 };
 export default Home;
 const styles = StyleSheet.create({
-  iconUpPost: { height: 24, width: 24, borderRadius: 5 },
+  iconUpPost: { height: 24, width: 24, borderRadius: 5, marginHorizontal: 5 },
   color9c9c9c: { color: '#9c9c9c' },
   optionBar: {
     height: 50,
     flex: 1,
     alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
   },
   btnUpPost: {
     backgroundColor: '#f3f3f3',

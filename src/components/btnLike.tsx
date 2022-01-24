@@ -56,6 +56,8 @@ const styles = StyleSheet.create({
   },
   marginRight: {
     marginRight: 5,
+    height: 20,
+    width: 20,
   },
   alignCenter: { alignSelf: 'center' },
   avaPost: {

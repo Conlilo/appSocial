@@ -1,0 +1,21 @@
+diff --git a/node_modules/@ahiho/react-native-attributed-text/src/index.tsx b/node_modules/@ahiho/react-native-attributed-text/src/index.tsx
+index be65ac4..477751c 100644
+--- a/node_modules/@ahiho/react-native-attributed-text/src/index.tsx
++++ b/node_modules/@ahiho/react-native-attributed-text/src/index.tsx
+@@ -26,7 +26,6 @@ interface AttributedTextProps extends TextProps {
+     [key: string]: TextProps;
+   };
+   children: string;
+-
+   wrapperStyle?: StyleProp<ViewStyle>;
+ }
+ 
+@@ -74,7 +73,7 @@ const AttributedText = ({
+     }
+     const tokenProps = annotationProps && annotationProps[token.annotation];
+     return (
+-      <Text {...tokenProps} key={index}>
++      <Text {...tokenProps} onPress={() => tokenProps.onPress(token.content)} key={index}>
+         {token.content}
+       </Text>
+     );

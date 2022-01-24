@@ -18,7 +18,7 @@ const PostStatus = ({
       style={{
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginVertical: 5,
+        marginBottom: 5,
       }}>
       <View style={styles.postStatus}>
         <Image source={Icon.Hearts} style={styles.marginRight} />

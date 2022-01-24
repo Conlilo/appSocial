@@ -105,7 +105,7 @@ const PostSocial = ({
               </View>
               <TouchableOpacity style={styles.postSale}>
                 <Image source={Icon.Pencil} />
-                <Text style={styles.color}>Đăng bán</Text>
+                <Text style={styles.colorPostSale}>Đăng bán</Text>
               </TouchableOpacity>
             </View>
             <View style={styles.bonusBorder}>
@@ -155,6 +155,8 @@ const styles = StyleSheet.create({
   },
   marginRight: {
     marginRight: 5,
+    height: 20,
+    width: 20,
   },
   alignCenter: { alignSelf: 'center', color: 'black' },
   avaPost: {
@@ -190,7 +192,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginVertical: 5,
   },
-  color: { color: '#24FF00' },
+  color: { color: '#2b9c1a' },
+  colorPostSale: { color: '#24FF00' },
   postSale: {
     flexDirection: 'row',
     borderWidth: 2,

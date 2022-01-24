@@ -8,6 +8,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
+  Linking,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { Icon } from '../core/icon';
@@ -95,7 +96,9 @@ const PostForm = ({
                   color: 'blue',
                   textDecorationLine: 'underline',
                 },
-                onPress: () => {},
+                onPress: text => {
+                  Linking.openURL(text);
+                },
               },
             }}
             style={styles.titlePost}>
