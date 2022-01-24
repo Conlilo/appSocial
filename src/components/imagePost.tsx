@@ -329,7 +329,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   youtubeComponent: { justifyContent: 'center', alignItems: 'center' },
-  btnPlay: { height: 50, width: 50, alignSelf: 'center' },
+  btnPlay: { height: 100, width: 100, alignSelf: 'center' },
 });
 
 export default ImagePost;
