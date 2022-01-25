@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchImageApi } from '../constants';
+import ImagePost from '../components/imagePost';
 import { Icon } from '../core/icon';
 import { dataActions } from '../redux/slices/dataApi';
 
@@ -33,6 +33,7 @@ const CreateImagePost = () => {
     <FlatList
       data={images}
       renderItem={item => {
+        console.log(item.item);
         return (
           // eslint-disable-next-line react-native/no-inline-styles
           <View style={{ marginTop: 10 }}>
@@ -43,15 +44,26 @@ const CreateImagePost = () => {
               style={styled.xicon}>
               <Image source={Icon.Xicon} style={styled.xicon} />
             </TouchableOpacity>
-            <Image
+            {item.item.includes('file:///') ? (
+              <Image
+                source={{ uri: item.item }}
+                // eslint-disable-next-line react-native/no-inline-styles
+                style={{ width: '100%', height: 300 }}
+              />
+            ) : (
+              <ImagePost imagesPost={[item.item]} disable={false} />
+            )}
+            {/* <Image
               source={{
                 uri: item.item.includes('file:///')
                   ? item.item
+                  : item.item.includes('video_')
+                  ? fetchVideoApi(item.item.split('video_')[1])
                   : fetchImageApi(item.item),
               }}
               // eslint-disable-next-line react-native/no-inline-styles
               style={{ width: '100%', height: 300 }}
-            />
+            /> */}
           </View>
         );
       }}

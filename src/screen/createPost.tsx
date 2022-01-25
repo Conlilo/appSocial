@@ -48,6 +48,32 @@ const CreatePost = () => {
   const [targetProduct, setTargetProduct] = useState(null);
   const [youtubeLink, setYoutubeLink] = useState('');
 
+  const getVideoId = (url: string): string => {
+    if (url) {
+      if (url.includes('https://www.youtube.com/watch?v=')) {
+        if (
+          url.split('https://www.youtube.com/watch?v=')[1].includes('&list=')
+        ) {
+          return url
+            .split('https://www.youtube.com/watch?v=')[1]
+            .split('&list=')[0];
+        }
+        return url.split('https://www.youtube.com/watch?v=')[1];
+      }
+      if (url.includes('https://youtube.com/watch?v=')) {
+        return url.split('https://youtube.com/watch?v=')[1];
+      }
+      if (url.includes('https://youtu.be/')) {
+        return url.split('https://youtu.be/')[1];
+      }
+      if (url.includes('https://img.youtube.com/vi/')) {
+        return url.split('https://img.youtube.com/vi/')[1].split('/')[0];
+      }
+    }
+
+    return '';
+  };
+
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
   };
@@ -334,7 +360,7 @@ const CreatePost = () => {
               </Text>
               <TextInput
                 style={styles.youtubeLinkBox}
-                placeholder=" Đường đãn Youtube"
+                placeholder=" Đường dẫn Youtube"
                 onChangeText={text => {
                   setYoutubeLink(text);
                 }}
@@ -353,11 +379,21 @@ const CreatePost = () => {
                 <TouchableOpacity
                   onPress={() => {
                     setModalVideo(!modalVideo);
-                    dispatch(
-                      dataActions.EditVideoCreate({
-                        video: 'video_' + youtubeLink.slice(32),
-                      }),
-                    );
+                    if (getVideoId(youtubeLink) === '') {
+                      Alert.alert(
+                        'Thông báo',
+                        'Đường dẫn không phải từ youtube',
+                        [{ text: 'OK' }],
+                      );
+                      setYoutubeLink('');
+                    } else {
+                      dispatch(
+                        dataActions.EditVideoCreate({
+                          video: 'video_' + getVideoId(youtubeLink),
+                        }),
+                      );
+                      setYoutubeLink('');
+                    }
                   }}
                   style={[
                     styles.btnYoutubeConfirm,
@@ -489,12 +525,14 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     height: 24,
     borderRadius: 10,
+    padding: 5,
   },
   searchBox: {
     backgroundColor: '#f3f3f3',
     height: 24,
     width: '90%',
     borderRadius: 5,
+    padding: 5,
   },
   optionBar: {
     height: 50,
