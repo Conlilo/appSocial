@@ -1,7 +1,7 @@
 import { useRoute } from '@react-navigation/native';
 import axios from 'axios';
 import moment from 'moment';
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useRef, useState } from 'react';
 import {
   FlatList,
   Image,
@@ -40,6 +40,7 @@ const PostComment = () => {
   const limit = useSelector(state => state.data.limit);
   const currentPost = useSelector(state => state.data.currentPost);
   const realStore = useSelector(state => state.data.realStore);
+  const refContainer = useRef();
   const active = useSelector(
     state => state.data.realStore.filter(x => x.id === idPost)[0].isLiked,
   );
@@ -112,6 +113,7 @@ const PostComment = () => {
     <View style={styles.stylePost}>
       <FlatList
         data={commentByIdFeed}
+        ref={refContainer}
         renderItem={({ item }) => {
           return (
             <CmtForm
@@ -325,6 +327,12 @@ const PostComment = () => {
                 });
               setComment('');
               _getCommentByFeedId();
+            }
+
+            if (refContainer.current) {
+              refContainer.current.scrollToEnd({
+                animated: true,
+              });
             }
           }}>
           <Image source={Icon.Send} style={styles.iconSend} />
