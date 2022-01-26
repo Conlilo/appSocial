@@ -229,19 +229,10 @@ const ImagePost = ({
 
           <View>
             {imagesPost.length > 3 ? (
-              <View
-                // eslint-disable-next-line react-native/no-inline-styles
-                style={{
-                  backgroundColor: '#00000080',
-                  width: Dimensions.get('window').width / 2,
-                  position: 'absolute',
-                  zIndex: 123,
-                  top: 0,
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  justifyContent: 'center',
-                }}>
+              <TouchableOpacity
+                onPress={() => imgView(2)}
+                disabled={disable}
+                style={styles.moreMedia}>
                 <Text
                   // eslint-disable-next-line react-native/no-inline-styles
                   style={{
@@ -251,7 +242,7 @@ const ImagePost = ({
                   }}>
                   +{imagesPost.length - 3}
                 </Text>
-              </View>
+              </TouchableOpacity>
             ) : (
               <PlayScreen
                 item={isVideo(imagesPost[2])}
@@ -330,6 +321,17 @@ const styles = StyleSheet.create({
   },
   youtubeComponent: { justifyContent: 'center', alignItems: 'center' },
   btnPlay: { height: 100, width: 100, alignSelf: 'center' },
+  moreMedia: {
+    backgroundColor: '#00000080',
+    width: Dimensions.get('window').width / 2,
+    position: 'absolute',
+    zIndex: 123,
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    justifyContent: 'center',
+  },
 });
 
 export default ImagePost;
