@@ -136,8 +136,8 @@ const PostForm = ({
               right: 0,
               paddingBottom: safeAreaInsets.bottom + 5,
               justifyContent: 'center',
-              borderTopRightRadius: 30,
-              borderTopLeftRadius: 30,
+              borderTopRightRadius: 16,
+              borderTopLeftRadius: 16,
             }}>
             <TouchableOpacity
               onPress={() => {
@@ -233,11 +233,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#000',
     alignSelf: 'center',
-    marginVertical: 16,
+    marginVertical: 8,
   },
   iconModal: {
     marginHorizontal: 10,
     justifyContent: 'center',
-    marginVertical: 16,
+    marginVertical: 8,
   },
 });
