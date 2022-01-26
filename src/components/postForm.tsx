@@ -134,8 +134,10 @@ const PostForm = ({
               bottom: 0,
               left: 0,
               right: 0,
-              paddingBottom: safeAreaInsets.bottom,
+              paddingBottom: safeAreaInsets.bottom + 5,
               justifyContent: 'center',
+              borderTopRightRadius: 30,
+              borderTopLeftRadius: 30,
             }}>
             <TouchableOpacity
               onPress={() => {
@@ -144,7 +146,11 @@ const PostForm = ({
               }}
               style={[
                 styles.flexRow,
-                { borderBottomWidth: 1, borderBottomColor: '#9c9c9c' },
+                {
+                  borderBottomWidth: 1,
+                  borderBottomColor: '#9c9c9c',
+                  marginHorizontal: 20,
+                },
               ]}>
               <Image source={Icon.Edit} style={styles.iconModal} />
               <Text style={styles.btnModal}>Sửa bài viết</Text>
@@ -172,6 +178,11 @@ const PostForm = ({
               }}
               style={[
                 styles.flexRow,
+                {
+                  borderBottomWidth: 1,
+                  borderBottomColor: '#9c9c9c',
+                  marginHorizontal: 20,
+                },
                 { borderBottomWidth: 1, borderBottomColor: '#9c9c9c' },
               ]}>
               <Image source={Icon.Delete} style={styles.iconModal} />
@@ -222,10 +233,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#000',
     alignSelf: 'center',
+    marginVertical: 16,
   },
   iconModal: {
     marginHorizontal: 10,
     justifyContent: 'center',
-    marginVertical: 3,
+    marginVertical: 16,
   },
 });
