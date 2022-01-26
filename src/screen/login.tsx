@@ -66,6 +66,7 @@ const Login = () => {
           style={styles.inputText}
           placeholder=" Số điện thoại "
           value={username}
+          keyboardType="numeric"
         />
         <TextInput
           onChangeText={text => {
