@@ -14,4 +14,6 @@ export enum Icon {
   Delete = require('../assets/icons/Trash.png'),
   Pencil = require('../assets/icons/Pencil.png'),
   Play = require('../assets/icons/play.png'),
+  Eye = require('../assets/icons/eye.png'),
+  Eyent = require('../assets/icons/eyent.png'),
 }

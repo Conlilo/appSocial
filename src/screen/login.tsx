@@ -14,10 +14,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppImage } from '../core/image';
 import { dataActions } from '../redux/slices/dataApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Icon } from '../core/icon';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [encode, setEncode] = useState(true);
   const user = useSelector(state => state.data.dataUser);
   const dispatch = useDispatch();
   const userDispatch = user.filter(
@@ -72,11 +74,19 @@ const Login = () => {
           onChangeText={text => {
             setPassword(text);
           }}
-          secureTextEntry={true}
+          secureTextEntry={encode}
           style={styles.inputText}
           placeholder=" Mật khẩu"
           value={password}
         />
+        <TouchableOpacity
+          style={styles.showandhidePassword}
+          onPress={() => {
+            setEncode(!encode);
+          }}>
+          {encode ? <Image source={Icon.Eye} /> : <Image source={Icon.Eyent} />}
+        </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.loginButton}
           onPress={async () => {
@@ -162,5 +172,10 @@ const styles = StyleSheet.create({
     marginTop: 26,
     marginBottom: 30,
     borderRadius: 15,
+  },
+  showandhidePassword: {
+    position: 'absolute',
+    right: 45,
+    top: 417,
   },
 });
