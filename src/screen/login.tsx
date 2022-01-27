@@ -1,8 +1,9 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Alert,
   Image,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -80,7 +81,11 @@ const Login = () => {
           value={password}
         />
         <TouchableOpacity
-          style={styles.showandhidePassword}
+          style={
+            Platform.OS === 'ios'
+              ? styles.showandhidePasswordIos
+              : styles.showandhidePasswordAndroid
+          }
           onPress={() => {
             setEncode(!encode);
           }}>
@@ -173,9 +178,14 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     borderRadius: 15,
   },
-  showandhidePassword: {
+  showandhidePasswordIos: {
     position: 'absolute',
     right: 45,
     top: 417,
+  },
+  showandhidePasswordAndroid: {
+    position: 'absolute',
+    right: 50,
+    top: 420,
   },
 });

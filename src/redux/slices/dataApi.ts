@@ -386,6 +386,12 @@ const addCommentByFeedId = (state, action) => {
   state.commentByIdFeed = action.payload.commentByIdFeed;
 };
 
+const delCommentByFeedId = (state, action) => {
+  state.commentByIdFeed = state.commentByIdFeed.filter(
+    x => x.id !== action.payload.idComment,
+  );
+};
+
 const dataSlice = createSlice({
   name: 'data',
   initialState,
@@ -416,6 +422,7 @@ const dataSlice = createSlice({
     EditImageCreate,
     uploadImage,
     EditVideoCreate,
+    delCommentByFeedId,
   },
 });
 

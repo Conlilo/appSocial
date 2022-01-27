@@ -23,7 +23,9 @@ import PostForm from '../components/postForm';
 import PostStatus from '../components/postStatus';
 import { fetchImageApi } from '../constants';
 import { Icon } from '../core/icon';
+import { commentActions } from '../redux/slices/comment';
 import { dataActions } from '../redux/slices/dataApi';
+import { flagActions } from '../redux/slices/flag';
 import getCommentByFeedId from '../services/commentByFeedId';
 import getCurrentPost from '../services/curentPost';
 import getPost from '../services/post';
@@ -40,6 +42,7 @@ const PostComment = () => {
   const limit = useSelector(state => state.data.limit);
   const currentPost = useSelector(state => state.data.currentPost);
   const realStore = useSelector(state => state.data.realStore);
+  const flagEditComment = useSelector(state => state.comment.flag);
   const refContainer = useRef();
   const active = useSelector(
     state => state.data.realStore.filter(x => x.id === idPost)[0].isLiked,
@@ -51,6 +54,7 @@ const PostComment = () => {
   const [keyboardHeight, setKeyboardHeight] = useState(safeAreaInsets.bottom);
 
   const currentPostDetail = realStore.filter(x => x.id === idPost)[0];
+  const curComment = useSelector(state => state.comment.comment);
 
   const _getPost = async () => {
     try {
@@ -101,6 +105,10 @@ const PostComment = () => {
   }, [userToken]);
 
   useEffect(() => {
+    _getCommentByFeedId();
+  }, [commentByIdFeed.length]);
+
+  useEffect(() => {
     Keyboard.addListener('keyboardDidShow', e => {
       setKeyboardHeight(e.endCoordinates.height);
     });
@@ -108,6 +116,10 @@ const PostComment = () => {
     Keyboard.addListener('keyboardWillHide', () => {
       setKeyboardHeight(0 + safeAreaInsets.bottom);
     });
+
+    if (flagEditComment) {
+      setComment(curComment.content);
+    }
   }, []);
   return (
     <View style={styles.stylePost}>
@@ -124,6 +136,8 @@ const PostComment = () => {
               timeComment={item.createdDate}
               repComment={item.replies}
               isParent={item.idParent}
+              userId={item.user.userId}
+              idPost={idPost}
             />
           );
         }}
@@ -236,7 +250,25 @@ const PostComment = () => {
             : // eslint-disable-next-line react-native/no-inline-styles
               { bottom: 25 },
         ]}>
-        {idFocusRep === '' ? (
+        {flagEditComment ? (
+          // eslint-disable-next-line react-native/no-inline-styles
+          <View style={[styles.flexRow, { paddingBottom: 40 }]}>
+            {/* eslint-disable-next-line react-native/no-inline-styles*/}
+            <Text style={{ color: '#868686' }}>Bạn đang sửa bình luận</Text>
+            <TouchableOpacity
+              onPress={() => {
+                dispatch(commentActions.changeFlag());
+                dispatch(commentActions.currentComment({ curComment: {} }));
+                setComment('');
+              }}>
+              <Image
+                source={Icon.Xicon}
+                /* eslint-disable-next-line react-native/no-inline-styles*/
+                style={{ width: 14, height: 17, tintColor: '#868686' }}
+              />
+            </TouchableOpacity>
+          </View>
+        ) : idFocusRep === '' ? (
           <View />
         ) : (
           // eslint-disable-next-line react-native/no-inline-styles
@@ -264,16 +296,52 @@ const PostComment = () => {
             : // eslint-disable-next-line react-native/no-inline-styles
               { bottom: 25 },
         ]}>
-        <TextInput
-          style={styles.inputText}
-          placeholder="Viết bình luận"
-          onChangeText={text => setComment(text)}
-          value={comment}
-        />
+        {flagEditComment ? (
+          <>
+            <TextInput
+              style={styles.inputText}
+              onChangeText={text => setComment(text)}
+              value={comment}
+            />
+          </>
+        ) : (
+          <TextInput
+            style={styles.inputText}
+            placeholder="Viết bình luận"
+            onChangeText={text => setComment(text)}
+            value={comment}
+          />
+        )}
+
         <TouchableOpacity
           onPress={async () => {
             // Comment
-            if (idFocusRep === '') {
+            if (flagEditComment) {
+              try {
+                await axios({
+                  method: 'post',
+                  // eslint-disable-next-line quotes
+                  url: `https://devapi.cuccu.vn/cuccu.api/Comments`,
+                  data: {
+                    id: curComment.id,
+                    idFeed: idPost,
+                    Content: comment,
+                  },
+                  headers: {
+                    Authorization: `Bearer ${userToken}`,
+                  },
+                });
+                const result = await getPost(limit);
+                dispatch(
+                  dataActions.addRealStore({ data: result?.data?.data }),
+                );
+                dispatch(commentActions.changeFlag());
+                setComment('');
+                _getCommentByFeedId();
+              } catch (e) {
+                console.log(e);
+              }
+            } else if (idFocusRep === '') {
               if (comment !== '') {
                 try {
                   await axios({

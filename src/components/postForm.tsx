@@ -77,7 +77,7 @@ const PostForm = ({
           });
         }}>
         <View style={styles.flexRow}>
-          <View style={{ position: 'absolute' }}>
+          <View style={styles.positionAb}>
             <Image source={AppImage.NoneAvatar} style={styles.avaPost} />
           </View>
           <Image source={{ uri: avaPost }} style={styles.avaPost} />
@@ -120,7 +120,7 @@ const PostForm = ({
       <View>
         <Modal
           isVisible={modalVisible}
-          style={{ margin: 0 }}
+          style={styles.margin0}
           onBackdropPress={() => {
             setModalVisible(!modalVisible);
           }}
@@ -128,30 +128,16 @@ const PostForm = ({
             setModalVisible(!modalVisible);
           }}>
           <View
-            style={{
-              backgroundColor: 'white',
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              paddingBottom: safeAreaInsets.bottom + 5,
-              justifyContent: 'center',
-              borderTopRightRadius: 16,
-              borderTopLeftRadius: 16,
-            }}>
+            style={[
+              styles.postionBtn,
+              { paddingBottom: safeAreaInsets.bottom + 5 },
+            ]}>
             <TouchableOpacity
               onPress={() => {
                 setModalVisible(!modalVisible);
                 navigation.navigate('CreatePost', idPost);
               }}
-              style={[
-                styles.flexRow,
-                {
-                  borderBottomWidth: 1,
-                  borderBottomColor: '#9c9c9c',
-                  marginHorizontal: 20,
-                },
-              ]}>
+              style={[styles.flexRow, styles.btn]}>
               <Image source={Icon.Edit} style={styles.iconModal} />
               <Text style={styles.btnModal}>Sửa bài viết</Text>
             </TouchableOpacity>
@@ -176,15 +162,7 @@ const PostForm = ({
                   },
                 ]);
               }}
-              style={[
-                styles.flexRow,
-                {
-                  borderBottomWidth: 1,
-                  borderBottomColor: '#9c9c9c',
-                  marginHorizontal: 20,
-                },
-                { borderBottomWidth: 1, borderBottomColor: '#9c9c9c' },
-              ]}>
+              style={[styles.flexRow, styles.btn]}>
               <Image source={Icon.Delete} style={styles.iconModal} />
               <Text style={styles.btnModal}>Xóa Bài Viết</Text>
             </TouchableOpacity>
@@ -239,5 +217,22 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     justifyContent: 'center',
     marginVertical: 8,
+  },
+  margin0: { margin: 0 },
+  positionAb: { position: 'absolute' },
+  postionBtn: {
+    backgroundColor: 'white',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    justifyContent: 'center',
+    borderTopRightRadius: 16,
+    borderTopLeftRadius: 16,
+  },
+  btn: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#9c9c9c',
+    marginHorizontal: 20,
   },
 });
