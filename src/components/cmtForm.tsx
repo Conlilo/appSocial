@@ -126,7 +126,6 @@ const CmtForm = ({
                               : {},
                           ]}
                           onLongPress={() => {
-                            console.log(item.item.user.userId);
                             setContentEditting(item.item.content);
                             setComment(item.item.id);
                             if (userLogin.userId === item.item.user.userId) {
