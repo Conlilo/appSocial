@@ -6,5 +6,6 @@ module.exports = {
   rules: {
     'no-shadow': 'off',
     '@typescript-eslint/no-shadow': ['error'],
+    'react-hooks/exhaustive-deps': 'off', // <--- THIS IS THE NEW RULE
   },
 };

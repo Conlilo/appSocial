@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import { useRoute } from '@react-navigation/native';
 import axios from 'axios';
 import moment from 'moment';
@@ -25,10 +26,10 @@ import { fetchImageApi } from '../constants';
 import { Icon } from '../core/icon';
 import { commentActions } from '../redux/slices/comment';
 import { dataActions } from '../redux/slices/dataApi';
-import { flagActions } from '../redux/slices/flag';
 import getCommentByFeedId from '../services/commentByFeedId';
 import getCurrentPost from '../services/curentPost';
 import getPost from '../services/post';
+import { useIsFocused } from '@react-navigation/native';
 
 const PostComment = () => {
   const safeAreaInsets = useSafeAreaInsets();
@@ -42,14 +43,15 @@ const PostComment = () => {
   const limit = useSelector(state => state.data.limit);
   const currentPost = useSelector(state => state.data.currentPost);
   const realStore = useSelector(state => state.data.realStore);
-  const flagEditComment = useSelector(state => state.comment.flag);
   const refContainer = useRef();
   const active = useSelector(
     state => state.data.realStore.filter(x => x.id === idPost)[0].isLiked,
   );
+  const isFocused = useIsFocused();
   const commentByIdFeed = useSelector(state => state.data.commentByIdFeed);
   const dispatch = useDispatch();
   const [comment, setComment] = useState('');
+  const commentEditing = useSelector(state => state.comment.commentEditing);
 
   const [keyboardHeight, setKeyboardHeight] = useState(safeAreaInsets.bottom);
 
@@ -65,7 +67,6 @@ const PostComment = () => {
       dispatch(dataActions.Logout());
     }
   };
-
   const _getCurrenPost = async () => {
     try {
       // const result = await getPost(offsetPost, limitPost);
@@ -116,11 +117,23 @@ const PostComment = () => {
     Keyboard.addListener('keyboardWillHide', () => {
       setKeyboardHeight(0 + safeAreaInsets.bottom);
     });
-
-    if (flagEditComment) {
-      setComment(curComment.content);
-    }
   }, []);
+
+  useEffect(() => {
+    if (commentEditing?.id) {
+      setComment(commentEditing.content);
+    }
+  }, [commentEditing?.id]);
+
+  useEffect(() => {
+    return () => {
+      if (!isFocused) {
+        dispatch(commentActions.currentComment({ curComment: {} }));
+        setComment('');
+      }
+    };
+  }, [isFocused]);
+
   return (
     <View style={styles.stylePost}>
       <FlatList
@@ -158,7 +171,6 @@ const PostComment = () => {
               <TouchableOpacity>
                 {currentPost.images !== null ||
                 currentPost.images !== undefined ? (
-                  /* eslint-disable-next-line react-native/no-inline-styles*/
                   <View style={{ flex: 1 }}>
                     <ImagePost
                       imagesPost={
@@ -173,7 +185,6 @@ const PostComment = () => {
                   <></>
                 )}
                 {/* Bắt đầu phần sản phẩm */}
-                {/* eslint-disable-next-line react-native/no-inline-styles */}
                 <View style={{ margin: 5 }}>
                   {currentPostDetail.product ? (
                     <>
@@ -239,7 +250,6 @@ const PostComment = () => {
             <Line />
           </Fragment>
         }
-        // eslint-disable-next-line react-native/no-inline-styles
         style={{ marginBottom: 80 }}
       />
       <View
@@ -247,23 +257,18 @@ const PostComment = () => {
           styles.createComment,
           Platform.OS === 'ios'
             ? { paddingBottom: keyboardHeight }
-            : // eslint-disable-next-line react-native/no-inline-styles
-              { bottom: 25 },
+            : { bottom: 25 },
         ]}>
-        {flagEditComment ? (
-          // eslint-disable-next-line react-native/no-inline-styles
+        {commentEditing?.id ? (
           <View style={[styles.flexRow, { paddingBottom: 40 }]}>
-            {/* eslint-disable-next-line react-native/no-inline-styles*/}
             <Text style={{ color: '#868686' }}>Bạn đang sửa bình luận</Text>
             <TouchableOpacity
               onPress={() => {
-                dispatch(commentActions.changeFlag());
-                dispatch(commentActions.currentComment({ curComment: {} }));
+                dispatch(commentActions.clearCommentEditing());
                 setComment('');
               }}>
               <Image
                 source={Icon.Xicon}
-                /* eslint-disable-next-line react-native/no-inline-styles*/
                 style={{ width: 14, height: 17, tintColor: '#868686' }}
               />
             </TouchableOpacity>
@@ -271,9 +276,7 @@ const PostComment = () => {
         ) : idFocusRep === '' ? (
           <View />
         ) : (
-          // eslint-disable-next-line react-native/no-inline-styles
           <View style={[styles.flexRow, { paddingBottom: 40 }]}>
-            {/* eslint-disable-next-line react-native/no-inline-styles*/}
             <Text style={{ color: '#868686' }}>
               Bạn đang trả lời {idFocusRep}
             </Text>
@@ -281,7 +284,6 @@ const PostComment = () => {
               onPress={() => dispatch(dataActions.defocusReplyUser())}>
               <Image
                 source={Icon.Xicon}
-                /* eslint-disable-next-line react-native/no-inline-styles*/
                 style={{ width: 14, height: 17, tintColor: '#868686' }}
               />
             </TouchableOpacity>
@@ -293,10 +295,9 @@ const PostComment = () => {
           styles.btnComment,
           Platform.OS === 'ios'
             ? { paddingBottom: keyboardHeight }
-            : // eslint-disable-next-line react-native/no-inline-styles
-              { bottom: 25 },
+            : { bottom: 25 },
         ]}>
-        {flagEditComment ? (
+        {commentEditing?.id ? (
           <>
             <TextInput
               style={styles.inputText}
@@ -316,14 +317,14 @@ const PostComment = () => {
         <TouchableOpacity
           onPress={async () => {
             // Comment
-            if (flagEditComment) {
+            if (commentEditing?.id) {
               try {
                 await axios({
                   method: 'post',
                   // eslint-disable-next-line quotes
                   url: `https://devapi.cuccu.vn/cuccu.api/Comments`,
                   data: {
-                    id: curComment.id,
+                    id: commentEditing?.id,
                     idFeed: idPost,
                     Content: comment,
                   },
@@ -335,7 +336,7 @@ const PostComment = () => {
                 dispatch(
                   dataActions.addRealStore({ data: result?.data?.data }),
                 );
-                dispatch(commentActions.changeFlag());
+                dispatch(commentActions.clearCommentEditing());
                 setComment('');
                 _getCommentByFeedId();
               } catch (e) {

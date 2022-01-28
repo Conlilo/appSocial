@@ -45,9 +45,10 @@ const CmtForm = ({
   const dispatch = useDispatch();
   const safeAreaInsets = useSafeAreaInsets();
   const [comment, setComment] = useState(0);
+  const [contentEditting, setContentEditting] = useState('');
+
   const userLogin = useSelector(state => state.data.accountLogin);
-  const flagEditComment = useSelector(state => state.comment.flag);
-  const curComment = useSelector(state => state.comment.comment);
+  const commentEditing = useSelector(state => state.comment.commentEditing);
 
   return (
     <>
@@ -65,11 +66,10 @@ const CmtForm = ({
                 <TouchableOpacity
                   style={[
                     styles.commentBox,
-                    flagEditComment && idComment === curComment.id
-                      ? styles.activeCmt
-                      : {},
+                    commentEditing.id === idComment ? styles.activeCmt : {},
                   ]}
                   onLongPress={() => {
+                    setContentEditting(titleComment);
                     setComment(idComment);
                     if (userLogin.userId === userId) {
                       setModal(!modal);
@@ -104,14 +104,7 @@ const CmtForm = ({
               renderItem={item => {
                 return (
                   <View style={styles.ml40}>
-                    <TouchableOpacity
-                      style={styles.flexRow}
-                      onLongPress={() => {
-                        setComment(item.item.id);
-                        if (userLogin.userId === item.item.user.userId) {
-                          setModal(!modal);
-                        }
-                      }}>
+                    <View style={styles.flexRow}>
                       <View style={styles.positionAb}>
                         <Image
                           source={AppImage.NoneAvatar}
@@ -125,12 +118,26 @@ const CmtForm = ({
                         style={styles.avaPost123}
                       />
                       <View>
-                        <View style={styles.commentBox}>
+                        <TouchableOpacity
+                          style={[
+                            styles.commentBox,
+                            commentEditing.id === item.item.id
+                              ? styles.activeCmt
+                              : {},
+                          ]}
+                          onLongPress={() => {
+                            console.log(item.item.user.userId);
+                            setContentEditting(item.item.content);
+                            setComment(item.item.id);
+                            if (userLogin.userId === item.item.user.userId) {
+                              setModal(!modal);
+                            }
+                          }}>
                           <Text style={styles.fontBold}>
                             {item.item.user.name}
                           </Text>
                           <Text>{item.item.content}</Text>
-                        </View>
+                        </TouchableOpacity>
                         <View style={styles.flexRow}>
                           <Text style={styles.color9c9c9c}>
                             {moment(item.item.createdDate)
@@ -150,7 +157,7 @@ const CmtForm = ({
                           </TouchableOpacity>
                         </View>
                       </View>
-                    </TouchableOpacity>
+                    </View>
                   </View>
                 );
               }}
@@ -177,13 +184,12 @@ const CmtForm = ({
                 ]}>
                 <TouchableOpacity
                   onPress={async () => {
-                    const result = await getComment(comment);
                     dispatch(
-                      commentActions.currentComment({
-                        curComment: result?.data.data,
+                      commentActions.commentEditing({
+                        id: comment,
+                        content: contentEditting,
                       }),
                     );
-                    dispatch(commentActions.changeFlag());
                     setModal(!modal);
                   }}
                   style={[styles.flexRow, styles.btn]}>
